@@ -1,4 +1,5 @@
 #include "plain_table.hpp"
+#include <vector>
 
 template<class T>
 PlainTable<T>::PlainTable(unsigned short l_rows, unsigned short l_columns) {
@@ -19,10 +20,10 @@ unsigned short PlainTable<T>::getRowsNum() {
 template<class T>
 void PlainTable<T>::setColumnsNum(unsigned short l_columns) {
     if (l_columns != this->columns) {
-        unsigned short restColumns =
+        unsigned short rest_columns = this->columns;
         this->columns = l_columns;
 
-        this->tableReset(this->rows, restColumns);
+        this->generateValueTable(nullptr, rest_columns);
     }
 }
 
@@ -32,11 +33,17 @@ void PlainTable<T>::setRowsNum(unsigned short l_rows) {
         unsigned short restRows = this->rows;
         this->rows = l_rows;
 
-        this->tableReset(restRows, this->columns);
+        // Regenerate it.
+        this->generateValueTable(restRows);
     }
 }
 
 template<class T>
-void PlainTable<T>::generateValueTable(unsigned short *old_rows, unsigned short *old_columns) {
-    // TODO
+void PlainTable<T>::generateValueTable() {
+    for (unsigned short row = 0; row < this->rows; ++row) {
+        this->table_values.emplace_back(std::vector<T>());
+        for (unsigned short column = 0; column < this->columns; ++column) {
+            this->table_values[row].emplace_back(T());
+        }
+    }
 }
