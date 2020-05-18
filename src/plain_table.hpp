@@ -3,6 +3,8 @@
 
 #include <vector>
 
+using constUnShort = const unsigned short;
+
 /*
  * A simple table object.
  *
@@ -24,7 +26,7 @@ public:
      * l_rows -> Define the number of rows of the table
      * l_columns -> Define the number of columns of the table
      */
-    PlainTable(unsigned short l_rows, unsigned short l_columns);
+    PlainTable(constUnShort l_rows, constUnShort l_columns);
 
     /*
      * Return the total number of rows.
@@ -36,9 +38,21 @@ public:
      */
     unsigned short getColumnsNum();
 
-    T getCellValue(unsigned short row, unsigned short column);
+    /*
+     * Return the cell value at a given row and column.
+     *
+     * If a row and column was given beyond the value a
+     * UnavailableCell error will be throw.
+     */
+    T getCellValue(constUnShort row, constUnShort column);
 
-    T setCellValue(unsigned short row, unsigned  short column);
+    /*
+     * Set the cell value at a given row and column.
+     *
+     * If a row and column was given beyond the value a
+     * UnavailableCell error will be throw.
+     */
+    void setCellValue(constUnShort row, constUnShort column, T value);
 
     /*
      * Define again the number of columns.
@@ -47,7 +61,7 @@ public:
      *
      * l_columns -> new number of columns
      */
-    void setColumnsNum(unsigned short l_columns);
+    void setColumnsNum(constUnShort l_columns);
 
     /*
      * Define again the number of rows.
@@ -56,7 +70,7 @@ public:
      *
      * l_rows -> new number of rows.
      */
-    void setRowsNum(unsigned short l_rows);
+    void setRowsNum(constUnShort l_rows);
 
 protected:
     /*
@@ -84,7 +98,7 @@ protected:
      * old_rows -> Old value of the table. If nullptr is set it will be ignored.
      * old_columns -> Old value of the table. If nullptr is set it will be ignored.
      */
-    void regenerateValueTable(unsigned short *old_rows = nullptr, unsigned short *old_columns = nullptr);
+    void regenerateValueTable(constUnShort *old_rows = nullptr, constUnShort *old_columns = nullptr);
 };
 
 
