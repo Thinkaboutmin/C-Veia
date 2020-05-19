@@ -20,6 +20,8 @@ namespace tic_tac_toe {
                         // Same but with the row. We will add the bottom divisor.
                         if (row_x + 1 != this->getRowsNum()) {
                             table += L"\u2550\u2550\u2550\u256c";
+                        } else {
+                            table += L"\u2550\u2550\u2550";
                         }
                     }
                 }
