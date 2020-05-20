@@ -1,7 +1,7 @@
 #include <vector>
 
 #include "plain_table.hpp"
-#include "../exceptions/table/table_exceptions.h"
+#include "../../exceptions/table/table_exceptions.h"
 namespace tic_tac_toe {
     template<class T>
     PlainTable<T>::PlainTable(constUnShort l_rows, constUnShort l_columns) {
