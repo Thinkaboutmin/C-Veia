@@ -1,7 +1,7 @@
 #ifndef TICTACTOE_STRING_TABLE_HPP
 #define TICTACTOE_STRING_TABLE_HPP
 
-#include "plain_table.hpp"
+#include "../lib/table/plain_table.hpp"
 #include <string>
 namespace tic_tac_toe {
     // A wide string table.
