@@ -4,8 +4,10 @@
 #include "player.h"
 
 namespace tic_tac_toe {
-    class Human : Player {
-
+    template<typename T>
+    class Human : Player<T> {
+    public:
+        PlayerMove<T> getMove(PlainTable<T> table) override;
     };
 }
 

@@ -4,9 +4,13 @@
 
 #ifndef TICTACTOE_PLAYER_H
 #define TICTACTOE_PLAYER_H
+
 #include <limits>
 #include <list>
 #include <string>
+
+#include "../table/plain_table.hpp"
+#include "player_move.h"
 
 namespace tic_tac_toe {
     /*
@@ -17,25 +21,27 @@ namespace tic_tac_toe {
      *
      * The symbol is freed after the Player deleter is called.
      */
+    template<typename T>
     class Player {
     private:
-
-        static std::list<std::wstring> players_symbols;
-        std::wstring player_symbol;
-
+        static std::list<T> players_symbols;
+        T player_symbol;
 
     public:
        // Return the player symbol.
-       std::wstring getPlayerSymbol();
+       const T& getPlayerSymbol();
 
        ~Player();
 
-       explicit Player(const std::wstring& symbol);
+       explicit Player(const T& symbol);
+
+       // Make the player act by getting its move intent.
+       virtual PlayerMove<T> getMove(PlainTable<T> table) = 0;
 
     protected:
         // Verify in our list of player symbols if there's match. If so,
         // returns true otherwise false.
-        static bool verifyIfUsedSymbol(const std::wstring& symbol);
+        static bool verifyIfUsedSymbol(const T& symbol);
     };
 }
 

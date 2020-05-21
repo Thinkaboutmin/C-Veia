@@ -4,9 +4,11 @@
 #include "player.h"
 
 namespace tic_tac_toe {
-    class AI : Player {
+    template<typename T>
+    class AI : Player<T> {
 
     };
+
 }
 
 

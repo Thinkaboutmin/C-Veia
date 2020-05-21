@@ -2,7 +2,8 @@
 #include "../../exceptions/player/player_exceptions.h"
 
 namespace tic_tac_toe {
-    Player::Player(const std::wstring& symbol) {
+    template<class T>
+    Player<T>::Player(const T& symbol) {
         if (!verifyIfUsedSymbol(symbol)) {
             this->player_symbol = symbol;
         } else{
@@ -10,12 +11,14 @@ namespace tic_tac_toe {
         }
     }
 
-    Player::~Player() {
+    template<class T>
+    Player<T>::~Player() {
         players_symbols.remove(this->player_symbol);
     }
 
-    bool Player::verifyIfUsedSymbol(const std::wstring& symbol) {
-        for (const std::wstring& list_symbol : players_symbols) {
+    template<class T>
+    bool Player<T>::verifyIfUsedSymbol(const T& symbol) {
+        for (const T& list_symbol : players_symbols) {
             if (list_symbol == symbol) {
                 return true;
             }
@@ -24,7 +27,10 @@ namespace tic_tac_toe {
         return false;
     }
 
-    std::wstring Player::getPlayerSymbol() {
+    template<class T>
+    const T& Player<T>::getPlayerSymbol() {
         return this->player_symbol;
     }
+
+
 }
