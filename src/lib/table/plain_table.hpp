@@ -15,10 +15,10 @@ namespace tic_tac_toe {
  */
     template<typename T>
     class PlainTable {
-// ************************* Variables *************************
     private:
         unsigned short rows = 0;
         unsigned short columns = 0;
+        T empty_value;
 
     protected:
         std::vector<std::vector<T>> table_values;
@@ -28,7 +28,7 @@ namespace tic_tac_toe {
          * l_rows -> Define the number of rows of the table
          * l_columns -> Define the number of columns of the table
          */
-        PlainTable(constUnShort l_rows, constUnShort l_columns);
+        PlainTable(constUnShort l_rows, constUnShort l_columns, T empty_value = T());
 
         /*
          * Return the total number of rows.
@@ -49,30 +49,46 @@ namespace tic_tac_toe {
         T getCellValue(constUnShort row, constUnShort column);
 
         /*
+         * Return the default or defined empty value for T.
+         */
+        T getEmptyValue();
+
+        /*
          * Set the cell value at a given row and column.
          *
          * If a row and column was given beyond the value a
          * UnavailableCell error will be throw.
+         *
+         * row -> the row which the cell is located
+         * column -> the column which the cell is located
+         * new_value -> new value for the cell.
          */
-        void setCellValue(constUnShort row, constUnShort column, T value);
+        void setCellValue(constUnShort row, constUnShort column, T new_value);
 
         /*
-         * Define again the number of columns.
+         * Define a new number of columns.
          *
          * Such action will redefine the entire table.
          *
-         * l_columns -> new number of columns
+         * new_columns -> new number of columns
          */
-        void setColumnsNum(constUnShort l_columns);
+        void setColumnsNum(constUnShort new_columns);
 
         /*
-         * Define again the number of rows.
+         * Define a new number of rows.
          *
          * Such action will redefine the entire table.
          *
-         * l_rows -> new number of rows.
+         * new_rows -> new number of rows.
          */
-        void setRowsNum(constUnShort l_rows);
+        void setRowsNum(constUnShort new_rows);
+
+        /*
+         * Define a new empty value for T type
+         *
+         * new_empty_value -> said new T empty value.
+         */
+        void setEmptyValue(T new_empty_value);
 
     protected:
         /*

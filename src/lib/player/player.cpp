@@ -32,5 +32,21 @@ namespace tic_tac_toe {
         return this->player_symbol;
     }
 
+    template<typename T>
+    rowsAndColumnsAvailable Player<T>::getAvailableMoves(const PlainTable<T> &table) {
+        rowsAndColumnsAvailable availableCells;
+
+        for (unsigned short row = 0; row < table.getRowsNum(); ++row) {
+            availableCells.emplace_back(std::vector<unsigned short>());
+            for (unsigned short column = 0; column < table.getColumnsNum(); ++column) {
+                if (table.getCellValue(row, column) == table.getEmptyValue()) {
+                    availableCells[row].emplace_back(column);
+                }
+            }
+        }
+
+        return tic_tac_toe::rowsAndColumnsAvailable();
+    }
+
 
 }

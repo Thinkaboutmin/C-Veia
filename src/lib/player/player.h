@@ -13,6 +13,8 @@
 #include "player_move.h"
 
 namespace tic_tac_toe {
+    using rowsAndColumnsAvailable = std::vector<std::vector<unsigned short>>;
+
     /*
      * Players of the tic tac toe game.
      *
@@ -36,12 +38,14 @@ namespace tic_tac_toe {
        explicit Player(const T& symbol);
 
        // Make the player act by getting its move intent.
-       virtual PlayerMove<T> getMove(PlainTable<T> table) = 0;
+       virtual PlayerMove<T> getMove(const PlainTable<T> &table) = 0;
 
     protected:
         // Verify in our list of player symbols if there's match. If so,
         // returns true otherwise false.
         static bool verifyIfUsedSymbol(const T& symbol);
+
+        static rowsAndColumnsAvailable getAvailableMoves(const PlainTable<T> &table);
     };
 }
 
