@@ -11,7 +11,7 @@ struct PlayerMove {
     const unsigned short column;
     const T value;
 
-    PlayerMove(const unsigned short row, const unsigned column, T value) :
+    PlayerMove(const unsigned short row, const unsigned short column, T value) :
               row(row), column(column), value(value) {}
 };
 

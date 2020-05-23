@@ -1,7 +1,3 @@
-//
-// Created by jomar on 19/05/2020.
-//
-
 #ifndef TICTACTOE_PLAYER_H
 #define TICTACTOE_PLAYER_H
 
@@ -13,7 +9,7 @@
 #include "player_move.h"
 
 namespace tic_tac_toe {
-    using rowsAndColumnsAvailable = std::vector<std::vector<unsigned short>>;
+    using rowsAndColumns = std::vector<std::vector<unsigned short>>;
 
     /*
      * Players of the tic tac toe game.
@@ -45,7 +41,9 @@ namespace tic_tac_toe {
         // returns true otherwise false.
         static bool verifyIfUsedSymbol(const T& symbol);
 
-        static rowsAndColumnsAvailable getAvailableMoves(const PlainTable<T> &table);
+        // Return a std::vector<std::vector<unsigned short>> with
+        // all the rows and columns which still have a default type.
+        static rowsAndColumns getAvailableMoves(const PlainTable<T> &table);
     };
 }
 

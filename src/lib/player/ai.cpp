@@ -60,11 +60,40 @@ namespace tic_tac_toe {
     using shortDistributor = std::uniform_int_distribution<unsigned short>;
     template<typename T>
     PlayerMove<T> AI<T>::easyMove(const PlainTable<T> &table) {
+        rowsAndColumns available_cells = getAvailableMoves(table);
+        // As we erase cells we will need to have a ordered list
+        // which holds data about the available rows index.
+        std::vector<unsigned short> available_rows;
+        for (unsigned short index_row = 0; index_row < table.getRowsNums(); ++index_row) {
+            available_rows.emplace_back(index_row);
+        }
+
+        // Prepare random number generation.
         std::mt19937_64 generator;
         generator.seed(std::chrono::system_clock::now().time_since_epoch().count());
-        shortDistributor distributeColumn(0, table.getColumnsNum());
-        // TODO: Implement a way to pick from the available cells vector.
+        shortDistributor dist(0,  available_rows.size() - 1);
 
+        while(true) {
+            unsigned short row = dist(generator); // Pseudo row index from ordered list
+            unsigned short true_row = available_rows[row]; // Actual row index
+
+            unsigned short columns = available_cells[true_row].size();
+            if (columns == 0) {
+                available_rows.erase(available_rows.begin() + row);
+                // Redefine possible values for ordered list.
+                dist.param(shortDistributor::param_type(0, available_rows.size() - 1));
+                continue;
+            } else if (columns == 1) {
+                // Disregard any cpu cycle here, just send the last column
+                // and be done with it.
+                return PlayerMove<T>(true_row, 0, this->getPlayerSymbol());
+            }
+
+            dist.param(shortDistributor::param_type(0, columns - 1));
+            unsigned short column = dist(generator);
+
+            return PlayerMove<T>(true_row, column, this->getPlayerSymbol());
+        }
     }
 
     template<typename T>
