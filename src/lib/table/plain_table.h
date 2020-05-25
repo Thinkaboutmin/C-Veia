@@ -30,7 +30,14 @@ namespace tic_tac_toe {
          * l_columns -> Define the number of columns of the table
          */
         PlainTable(constUnShort l_rows, constUnShort l_columns, T empty_value = T()) {
+            if (l_rows == 0) {
+                throw RowIsZero();
+            }
             this->rows = l_rows;
+
+            if (l_columns == 0) {
+                throw ColumnIsZero();
+            }
             this->columns = l_columns;
             this->empty_value = empty_value;
 
@@ -98,6 +105,10 @@ namespace tic_tac_toe {
          * new_columns -> new number of columns
          */
         void setColumnsNum(constUnShort new_columns) {
+            if (new_columns == 0) {
+                throw ColumnIsZero();
+            }
+
             if (new_columns != this->columns) {
                 unsigned short rest_columns = this->columns;
                 this->columns = new_columns;
@@ -112,6 +123,10 @@ namespace tic_tac_toe {
          * new_rows -> new number of rows.
          */
         void setRowsNum(constUnShort new_rows) {
+            if (new_rows == 0) {
+                throw RowIsZero();
+            }
+
             if (new_rows != this->rows) {
                 unsigned short rest_rows = this->rows;
                 this->rows = new_rows;
