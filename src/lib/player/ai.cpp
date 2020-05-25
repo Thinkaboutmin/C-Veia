@@ -85,7 +85,7 @@ namespace tic_tac_toe {
             } else if (columns == 1) {
                 // Disregard any cpu cycle here, just send the last column
                 // and be done with it.
-                return PlayerMove<T>(true_row, 0, this->getPlayerSymbol());
+                return PlayerMove<T>(true_row, available_cells[row], this->getPlayerSymbol());
             }
 
             dist.param(shortDistributor::param_type(0, columns - 1));
