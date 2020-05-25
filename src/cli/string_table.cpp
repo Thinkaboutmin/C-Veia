@@ -1,8 +1,11 @@
 #include <string>
 
-#include "string_table.hpp"
+#include "string_table.h"
 
 namespace tic_tac_toe {
+    StringTable::StringTable(constUnShort rows, constUnShort columns) : PlainTable<std::wstring>(rows, columns) {
+    }
+
     std::wstring StringTable::tableString() {
         std::wstring table;
 

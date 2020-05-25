@@ -60,7 +60,7 @@ namespace tic_tac_toe {
     using shortDistributor = std::uniform_int_distribution<unsigned short>;
     template<typename T>
     PlayerMove<T> AI<T>::easyMove(const PlainTable<T> &table) {
-        rowsAndColumns available_cells = getAvailableMoves(table);
+        rowsAndColumns available_cells = Player<T>::getAvailableMoves(table);
         // As we erase cells we will need to have a ordered list
         // which holds data about the available rows index.
         std::vector<unsigned short> available_rows;
@@ -69,8 +69,7 @@ namespace tic_tac_toe {
         }
 
         // Prepare random number generation.
-        std::mt19937_64 generator;
-        generator.seed(std::chrono::system_clock::now().time_since_epoch().count());
+        std::mt19937_64 generator(std::chrono::system_clock::now().time_since_epoch().count());
         shortDistributor dist(0,  available_rows.size() - 1);
 
         while(true) {
@@ -103,6 +102,8 @@ namespace tic_tac_toe {
 
     template<typename T>
     PlayerMove<T> AI<T>::hardMove(const PlainTable<T> &table) {
+        rowsAndColumns available_cells = Player<T>::getAvailableMoves();
+
         return PlayerMove<T>(0, 0, T());
     }
 }

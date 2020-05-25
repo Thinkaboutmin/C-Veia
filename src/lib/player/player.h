@@ -5,8 +5,9 @@
 #include <list>
 #include <string>
 
-#include "../table/plain_table.hpp"
+#include "../table/plain_table.h"
 #include "player_move.h"
+#include "../../exceptions/player/player_exceptions.h"
 
 namespace tic_tac_toe {
     using rowsAndColumns = std::vector<std::vector<unsigned short>>;
@@ -27,11 +28,21 @@ namespace tic_tac_toe {
 
     public:
        // Return the player symbol.
-       const T& getPlayerSymbol();
+       const T& getPlayerSymbol() {
+           return this->player_symbol;
+       }
 
-       ~Player();
+       ~Player() {
+           players_symbols.remove(this->player_symbol);
+       }
 
-       explicit Player(const T& symbol);
+       explicit Player(const T& symbol) {
+           if (!verifyIfUsedSymbol(symbol)) {
+               this->player_symbol = symbol;
+           } else{
+               throw UnusableSymbol();
+           }
+       }
 
        // Make the player act by getting its move intent.
        virtual PlayerMove<T> getMove(const PlainTable<T> &table) = 0;
@@ -39,11 +50,32 @@ namespace tic_tac_toe {
     protected:
         // Verify in our list of player symbols if there's match. If so,
         // returns true otherwise false.
-        static bool verifyIfUsedSymbol(const T& symbol);
+        static bool verifyIfUsedSymbol(const T& symbol) {
+            for (const T& list_symbol : players_symbols) {
+                if (list_symbol == symbol) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
 
         // Return a std::vector<std::vector<unsigned short>> with
         // all the rows and columns which still have a default type.
-        static rowsAndColumns getAvailableMoves(const PlainTable<T> &table);
+        static rowsAndColumns getAvailableMoves(const PlainTable<T> &table) {
+            rowsAndColumns availableCells;
+
+            for (unsigned short row = 0; row < table.getRowsNum(); ++row) {
+                availableCells.emplace_back(std::vector<unsigned short>());
+                for (unsigned short column = 0; column < table.getColumnsNum(); ++column) {
+                    if (table.getCellValue(row, column) == table.getEmptyValue()) {
+                        availableCells[row].emplace_back(column);
+                    }
+                }
+            }
+
+            return availableCells;
+        }
     };
 }
 
