@@ -102,6 +102,7 @@ namespace tic_tac_toe {
 
     template<typename T>
     PlayerMove<T> AI<T>::hardMove(const PlainTable<T> &table) {
+        // TODO: Develop an algorithm which
         rowsAndColumns available_cells = Player<T>::getAvailableMoves();
 
         return PlayerMove<T>(0, 0, T());

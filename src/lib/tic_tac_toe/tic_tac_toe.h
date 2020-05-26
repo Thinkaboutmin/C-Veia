@@ -9,15 +9,29 @@
 
 namespace tic_tac_toe {
     template<typename T>
+    /*
+     * Tic Tac Toe game control.
+     *
+     * Here we get the control for the game to get the next player to play and
+     * check the table for a winner. The player move is dependent by the user to
+     * implement such the same applies to the winner check condition
+     * which needs to be explicit asked.
+     */
     class TicTacToe {
         using playerIterator = std::vector<Player<T>, std::allocator<Player<T>>>;
     private:
-        std::vector<Player<T>> players;
+        std::vector<const Player<T>&> players;
         playerIterator playerToPlay;
         const PlainTable<T> & table;
         Player<T> * winner = nullptr;
 
     public:
+        /*
+         * Constructor
+         *
+         * players -> An ordered list of players. The first there is the first to play.
+         * table -> The actual table in which the game should occur.
+         */
         TicTacToe(std::vector<Player<T>> players, const PlainTable<T> &table) : table(table) {
             if (players.empty()) {
                 throw NotEnoughPlayers();
@@ -30,6 +44,7 @@ namespace tic_tac_toe {
             }
         }
 
+        // Return the next player of our vector.
         const Player<T>& getNextPlayer() {
             if (playerToPlay == players.end()) {
                 playerToPlay = players.begin();
@@ -40,6 +55,7 @@ namespace tic_tac_toe {
             return player;
         }
 
+        // Verifies for the given table for a winner.
         bool isThereAWinner() {
             T checkSymbol = table.getEmptyValue();
 
@@ -138,11 +154,13 @@ namespace tic_tac_toe {
             return false;
         }
 
+        // Get a winner defined after the check.
         const Player<T> * getWinner() {
             return winner;
         }
 
     private:
+        // Pick a player which the symbol matches.
         Player<T> checkSymbolForPlayer(T symbol) {
             for (Player<T> player : players) {
                 if (player.getPlayerSymbol() == symbol) {
