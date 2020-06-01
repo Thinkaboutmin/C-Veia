@@ -1,7 +1,3 @@
-//
-// Created by jomar on 29/05/2020.
-//
-
 #ifndef TICTACTOE_TIC_TAC_TOE_FACTORY_H
 #define TICTACTOE_TIC_TAC_TOE_FACTORY_H
 
