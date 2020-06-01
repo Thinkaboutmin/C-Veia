@@ -58,7 +58,8 @@ namespace tic_tac_toe {
     }
 
     using shortDistributor = std::uniform_int_distribution<unsigned short>;
-    template<typename T>
+
+    template<class T>
     PlayerMove<T> AI<T>::easyMove(const PlainTable<T> &table) {
         rowsAndColumns available_cells = Player<T>::getAvailableMoves(table);
         // As we erase cells we will need to have a ordered list
@@ -95,14 +96,14 @@ namespace tic_tac_toe {
         }
     }
 
-    template<typename T>
+    template<class T>
     PlayerMove<T> AI<T>::normalMove(const PlainTable<T> &table) {
         return PlayerMove<T>(0, 0, T());
     }
 
-    template<typename T>
+    template<class T>
     PlayerMove<T> AI<T>::hardMove(const PlainTable<T> &table) {
-        // TODO: Develop an algorithm which
+        // TODO: Develop an algorithm which plays thoughtfully.
         rowsAndColumns available_cells = Player<T>::getAvailableMoves();
 
         return PlayerMove<T>(0, 0, T());
