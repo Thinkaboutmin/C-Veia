@@ -29,8 +29,6 @@ namespace tic_tac_toe {
         /*
          * Constructor
          *
-         * Clones Players and Table hence it can't be modified afterwards.
-         *
          * players -> An ordered list of players. The first there is the first to play.
          * table -> The actual table in which the game should occur.
          */
@@ -54,7 +52,7 @@ namespace tic_tac_toe {
 
         // Return the next player of our vector.
         const Player<T>& getNextPlayer() {
-            if (playerToPlay == players.end()) {/
+            if (playerToPlay == players.end()) {
                 playerToPlay = players.begin();
             }
 
