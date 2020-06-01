@@ -36,26 +36,26 @@ namespace tic_tac_toe {
          */
         TicTacToe(const std::vector<Player<T>> &players, const PlainTable<T> &table) :
                  table(table), players(players) {
-            if (this->players->empty()) {
+            if (this->players.empty()) {
                 throw NotEnoughPlayers();
             }
 
             // Make sure that each player have a different symbol.
             for (Player<T> player : this->players) {
-                if (player.getPlayerSymbol() == table->getEmptyValue()) {
+                if (player.getPlayerSymbol() == table.getEmptyValue()) {
                     throw EmptyValueConflict();
                 }
             }
 
-            if (this->table->getRowsNum() != this->table->getColumnsNum()) {
+            if (this->table.getRowsNum() != this->table.getColumnsNum()) {
                 throw TableIsNotEqualInSides();
             }
         }
 
         // Return the next player of our vector.
         const Player<T>& getNextPlayer() {
-            if (playerToPlay == players->end()) {
-                playerToPlay = players->begin();
+            if (playerToPlay == players.end()) {/
+                playerToPlay = players.begin();
             }
 
             const Player<T> & player = playerToPlay;
@@ -65,17 +65,17 @@ namespace tic_tac_toe {
 
         // Verifies for the given table for a winner.
         bool isThereAWinner() {
-            T checkSymbol = table->getEmptyValue();
+            T checkSymbol = table.getEmptyValue();
 
             bool win = false;
             // Check each column in a row for a horizontal win.
-            for (unsigned short row = 0; row < table->getRowsNum(); ++row) {
-                for (unsigned short column = 0; column < table->getColumnsNum(); ++column) {
-                    T symbol = table->getCellValue(row, column);
-                    if (symbol == table->getEmptyValue()) {
+            for (unsigned short row = 0; row < table.getRowsNum(); ++row) {
+                for (unsigned short column = 0; column < table.getColumnsNum(); ++column) {
+                    T symbol = table.getCellValue(row, column);
+                    if (symbol == table.getEmptyValue()) {
                         win = false;
                         break;
-                    } else if (checkSymbol == table->getEmptyValue()) {
+                    } else if (checkSymbol == table.getEmptyValue()) {
                         // What is the table is 1x1? Let's make it a win :P
                         win = true;
                         checkSymbol = symbol;
@@ -95,9 +95,9 @@ namespace tic_tac_toe {
 
             if (!win) {
                 // Check for each row in a column for a vertical win.
-                for (unsigned short column = 0; column < table->getColumnsNum(); ++column) {
-                    for (unsigned short row = 0; row < table->getRowsNum(); ++row) {
-                        T symbol = table->getCellValue(row, column);
+                for (unsigned short column = 0; column < table.getColumnsNum(); ++column) {
+                    for (unsigned short row = 0; row < table.getRowsNum(); ++row) {
+                        T symbol = table.getCellValue(row, column);
                         if (symbol == table.getEmptyValue()) {
                             win = false;
                             break;
