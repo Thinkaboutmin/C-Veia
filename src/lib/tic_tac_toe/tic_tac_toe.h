@@ -32,7 +32,7 @@ namespace tic_tac_toe {
          * players -> An ordered list of players. The first there is the first to play.
          * table -> The actual table in which the game should occur.
          */
-        TicTacToe(const std::vector<Player<T>> &players, const PlainTable<T> &table) :
+        TicTacToe(std::vector<Player<T>> players, PlainTable<T> table) :
                  table(table), players(players) {
             if (this->players.empty()) {
                 throw NotEnoughPlayers();
@@ -48,6 +48,11 @@ namespace tic_tac_toe {
             if (this->table.getRowsNum() != this->table.getColumnsNum()) {
                 throw TableIsNotEqualInSides();
             }
+        }
+
+        void playerPlay() {
+            PlayerMove<T> move = getNextPlayer().getMove(table);
+            table.setCellValue(move.row, move.column, move.value);
         }
 
         // Return the next player of our vector.
