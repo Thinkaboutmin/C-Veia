@@ -7,7 +7,7 @@
 
 #include "../table/plain_table.h"
 #include "player_move.h"
-#include "../../exceptions/player/player_exceptions.h"
+#include "../exceptions/player/player_exceptions.h"
 
 namespace tic_tac_toe {
     using rowsAndColumns = std::vector<std::vector<unsigned short>>;

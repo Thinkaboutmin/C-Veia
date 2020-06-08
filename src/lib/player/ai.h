@@ -2,7 +2,7 @@
 #define TICTACTOE_AI_H
 
 #include "player.h"
-#include "../../exceptions/player/player_exceptions.h"
+#include "../exceptions/player/player_exceptions.h"
 #include "players_enum.h"
 
 namespace tic_tac_toe {

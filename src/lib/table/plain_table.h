@@ -2,7 +2,7 @@
 #define TICTACTOE_PLAIN_TABLE_H
 
 #include <vector>
-#include "../../exceptions/table/table_exceptions.h"
+#include "../exceptions/table/table_exceptions.h"
 
 namespace tic_tac_toe {
     using constUnShort = const unsigned short;

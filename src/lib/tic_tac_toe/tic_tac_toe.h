@@ -5,7 +5,7 @@
 
 #include "../player/player.h"
 #include "../table/plain_table.h"
-#include "../../exceptions/tic_tac_toe/tic_tac_toe_exceptions.h"
+#include "../exceptions/tic_tac_toe/tic_tac_toe_exceptions.h"
 
 namespace tic_tac_toe {
     template<typename T>
@@ -19,7 +19,7 @@ namespace tic_tac_toe {
      */
     class TicTacToe {
         using playerIterator = std::vector<Player<T>, std::allocator<Player<T>>>;
-    private:
+    protected:
         const std::vector<const Player<T>> players;
         playerIterator playerToPlay;
         const PlainTable<T> table;
@@ -158,7 +158,7 @@ namespace tic_tac_toe {
             }
 
             if (win) {
-                this->winner = checkSymbolForPlayer(checkSymbol);
+                this->winner = TicTacToe::checkSymbolForPlayer(checkSymbol);
                 return win;
             }
 
@@ -178,6 +178,8 @@ namespace tic_tac_toe {
                     return player;
                 }
             }
+
+            return Player<T>(T());
         }
     };
 }
