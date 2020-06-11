@@ -7,7 +7,7 @@
 
 namespace tic_tac_toe {
     // A wide string table.
-    class StringTable : PlainTable<std::wstring> {
+    class StringTable : public PlainTable<std::wstring> {
     public:
         StringTable(constUnShort rows, constUnShort columns);
 

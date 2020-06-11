@@ -9,9 +9,9 @@ template<typename T>
 struct PlayerMove {
     const unsigned short row;
     const unsigned short column;
-    const T value;
+    const T & value;
 
-    PlayerMove(const unsigned short row, const unsigned short column, T value) :
+    PlayerMove(const unsigned short row, const unsigned short column, const T &value) :
               row(row), column(column), value(value) {}
 };
 

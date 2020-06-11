@@ -6,6 +6,7 @@
 #include "../player/player.h"
 #include "../table/plain_table.h"
 #include "../exceptions/tic_tac_toe/tic_tac_toe_exceptions.h"
+#include "tic_tac_toe_enum.h"
 
 namespace tic_tac_toe {
     template<typename T>
@@ -18,11 +19,10 @@ namespace tic_tac_toe {
      * which needs to be explicit asked.
      */
     class TicTacToe {
-        using playerIterator = std::vector<Player<T>, std::allocator<Player<T>>>;
     protected:
-        const std::vector<const Player<T>> players;
-        playerIterator playerToPlay;
-        const PlainTable<T> table;
+        std::vector<Player<T> *> players;
+        unsigned short playerToPlay = 0;
+        PlainTable<T> *table = nullptr;
         Player<T> * winner = nullptr;
 
     public:
@@ -32,137 +32,153 @@ namespace tic_tac_toe {
          * players -> An ordered list of players. The first there is the first to play.
          * table -> The actual table in which the game should occur.
          */
-        TicTacToe(std::vector<Player<T>> players, PlainTable<T> table) :
-                 table(table), players(players) {
+        TicTacToe(std::vector<Player<T> *> players, PlainTable<T> * table) :
+                table(table), players(players) {
             if (this->players.empty()) {
                 throw NotEnoughPlayers();
             }
 
             // Make sure that each player have a different symbol.
-            for (Player<T> player : this->players) {
-                if (player.getPlayerSymbol() == table.getEmptyValue()) {
+            for (Player<T> * player : this->players) {
+                if (player->getPlayerSymbol() == table->getEmptyValue()) {
                     throw EmptyValueConflict();
                 }
             }
 
-            if (this->table.getRowsNum() != this->table.getColumnsNum()) {
+            if (this->table->getRowsNum() != this->table->getColumnsNum()) {
                 throw TableIsNotEqualInSides();
             }
         }
 
         void playerPlay() {
-            PlayerMove<T> move = getNextPlayer().getMove(table);
-            table.setCellValue(move.row, move.column, move.value);
+            PlayerMove<T> move = getNextPlayer().getMove(*table);
+            table->setCellValue(move.row, move.column, move.value);
         }
 
         // Return the next player of our vector.
-        const Player<T>& getNextPlayer() {
-            if (playerToPlay == players.end()) {
-                playerToPlay = players.begin();
+        Player<T> & getNextPlayer() {
+            if (playerToPlay > players.size() - 1) {
+                playerToPlay = 0;
             }
 
-            const Player<T> & player = playerToPlay;
+            Player<T> &player = *(players[playerToPlay]);
             ++playerToPlay;
             return player;
         }
 
         // Verifies for the given table for a winner.
-        bool isThereAWinner() {
-            T checkSymbol = table.getEmptyValue();
+        GameStatus isThereAWinner() {
+            if (!anyMovementAvailable()) {
+                return GameStatus::DRAW;
+            }
+
+            T checkSymbol = table->getEmptyValue();
 
             bool win = false;
             // Check each column in a row for a horizontal win.
-            for (unsigned short row = 0; row < table.getRowsNum(); ++row) {
-                for (unsigned short column = 0; column < table.getColumnsNum(); ++column) {
-                    T symbol = table.getCellValue(row, column);
-                    if (symbol == table.getEmptyValue()) {
+            for (unsigned short row = 1; row <= table->getRowsNum(); ++row) {
+                for (unsigned short column = 1; column <= table->getColumnsNum(); ++column) {
+                    T symbol = table->getCellValue(row, column);
+                    if (symbol == table->getEmptyValue()) {
                         win = false;
                         break;
-                    } else if (checkSymbol == table.getEmptyValue()) {
-                        // What is the table is 1x1? Let's make it a win :P
+                    } else if (checkSymbol == table->getEmptyValue()) {
+                        // What if the table is 1x1? Let's make it a win :P
                         win = true;
                         checkSymbol = symbol;
-                    } else {
+                    } else if (checkSymbol == symbol) {
                         // Keep the win condition true until something goes wrong.
                         win = true;
+                    } else {
+                        win = false;
+                        break;
                     }
                 }
 
                 if (win) {
-                    this->winner = checkSymbolForPlayer(checkSymbol);
-                    return win;
+                    this->winner = TicTacToe::checkSymbolForPlayer(checkSymbol);
+                    return GameStatus::WIN;
                 }
                 // Renew symbol to empty one.
-                checkSymbol = table.getEmptyValue();
+                checkSymbol = table->getEmptyValue();
             }
 
             if (!win) {
                 // Check for each row in a column for a vertical win.
-                for (unsigned short column = 0; column < table.getColumnsNum(); ++column) {
-                    for (unsigned short row = 0; row < table.getRowsNum(); ++row) {
-                        T symbol = table.getCellValue(row, column);
-                        if (symbol == table.getEmptyValue()) {
+                for (unsigned short column = 1; column <= table->getColumnsNum(); ++column) {
+                    for (unsigned short row = 1; row <= table->getRowsNum(); ++row) {
+                        T symbol = table->getCellValue(row, column);
+                        if (symbol == table->getEmptyValue()) {
                             win = false;
                             break;
-                        } else if (checkSymbol == table.getEmptyValue()) {
+                        } else if (checkSymbol == table->getEmptyValue()) {
                             // What if the table is 1x1? Let's make it a win :P
                             win = true;
                             checkSymbol = symbol;
-                        } else {
+                        } else if (checkSymbol == symbol) {
                             // Keep the win condition true until something goes wrong.
                             win = true;
+                        } else {
+                            win = false;
+                            break;
                         }
                     }
                     // Renew symbol to empty one.
-                    checkSymbol = table.getEmptyValue();
+                    checkSymbol = table->getEmptyValue();
                 }
             }
 
             if (!win) {
                 // Check diagonally to the left;
-                for (unsigned short col_row = 0; col_row < table.getColumnsNum(); ++col_row) {
-                    T symbol = table.getCellValue(col_row, col_row);
-                    if (symbol == table.getEmptyValue()) {
+                for (unsigned short col_row = 1; col_row <= table->getColumnsNum(); ++col_row) {
+                    T symbol = table->getCellValue(col_row, col_row);
+                    if (symbol == table->getEmptyValue()) {
                         win = false;
                         break;
-                    } else if (checkSymbol == table.getEmptyValue()) {
+                    } else if (checkSymbol == table->getEmptyValue()) {
                         // What if the table is 1x1? Let's make it a win :P
                         win = true;
                         checkSymbol = symbol;
-                    } else {
+                    } else if (checkSymbol == symbol) {
                         // Keep the win condition true until something goes wrong.
                         win = true;
+                    } else {
+                        win = false;
+                        break;
                     }
                 }
 
                 // Renew symbol to empty one
-                checkSymbol = table.getEmptyValue();
+                checkSymbol = table->getEmptyValue();
             }
 
             if (!win) {
                 // Check diagonally to the right;
-                for (unsigned short col_row = table.getRowsNum(); col_row != 0; --col_row) {
-                    T symbol = table.getCellValue(col_row, col_row);
-                    if (symbol == table.getEmptyValue()) {
+                for (unsigned short col_row = table->getRowsNum(); col_row != 0; --col_row) {
+                    T symbol = table->getCellValue(col_row, col_row);
+                    if (symbol == table->getEmptyValue()) {
                         win = false;
                         break;
-                    } else if (checkSymbol == table.getEmptyValue()) {
+                    } else if (checkSymbol == table->getEmptyValue()) {
                         // What if the table is 1x1? Let's make it a win :P
                         win = true;
                         checkSymbol = symbol;
-                    } else {
+                    } else if (checkSymbol == symbol) {
                         // Keep the win condition true until something goes wrong.
                         win = true;
+                    } else {
+                        win = false;
+                        break;
                     }
                 }
             }
 
             if (win) {
                 this->winner = TicTacToe::checkSymbolForPlayer(checkSymbol);
-                return win;
+                return GameStatus::WIN;
             }
 
-            return false;
+            return GameStatus::ONGOING;
         }
 
         // Get a winner defined after the check.
@@ -170,16 +186,40 @@ namespace tic_tac_toe {
             return winner;
         }
 
+        virtual ~TicTacToe() {
+            for (Player<T> * player : players) {
+                delete player;
+            }
+
+            players.clear();
+
+            delete table;
+        }
+
     private:
         // Pick a player which the symbol matches.
-        Player<T> checkSymbolForPlayer(T symbol) {
-            for (Player<T> player : players) {
-                if (player.getPlayerSymbol() == symbol) {
+        Player<T> * checkSymbolForPlayer(T symbol) {
+            for (Player<T> * player : players) {
+                if (player->getPlayerSymbol() == symbol) {
                     return player;
                 }
             }
 
-            return Player<T>(T());
+            return nullptr;
+        }
+
+        // Return a std::vector<std::vector<unsigned short>> with
+        // all the rows and columns which still have a default type.
+        bool anyMovementAvailable() {
+            for (unsigned short row = 1; row <= this->table->getRowsNum(); ++row) {
+                for (unsigned short column = 1; column <= this->table->getColumnsNum(); ++column) {
+                    if (this->table->getCellValue(row, column) == this->table->getEmptyValue()) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
     };
 }

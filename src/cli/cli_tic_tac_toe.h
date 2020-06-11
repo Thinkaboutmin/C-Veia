@@ -8,13 +8,13 @@
 #include <vector>
 
 using namespace tic_tac_toe;
-class CliTicTacToe : TicTacToe<std::wstring>{
+class CliTicTacToe : public TicTacToe<std::wstring>{
 private:
-    StringTable &refTable;
+    StringTable * cli_table = nullptr;
 public:
-    CliTicTacToe(std::vector<Player<std::wstring>> players, StringTable table) :
-                TicTacToe(players, table),
-                refTable(static_cast<StringTable>(this->table)){}
+    CliTicTacToe(std::vector<Player<std::wstring> *> players, StringTable * table) :
+                cli_table(table),
+                TicTacToe<std::wstring>(players, table) {}
 
     /*
      * Prints the string table.

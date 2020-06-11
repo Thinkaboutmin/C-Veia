@@ -7,15 +7,19 @@
 namespace tic_tac_toe {
     using constUnShort = const unsigned short;
 
-/*
- * A simple table object.
- *
- * The T type is the value which our table will hold inside each cell.
- * Such a type shall have a constructor capable of not accepting any
- * data set.
- */
+    /*
+    * A simple table object.
+    *
+    * The T type is the value which our table will hold inside each cell.
+    * Such a type shall have a constructor capable of not accepting any
+    * data set.
+    */
     template<typename T>
     class PlainTable {
+
+    /**************************************************************
+     *                     Variable Definition                    *
+     *************************************************************/
     private:
         unsigned short rows = 0;
         unsigned short columns = 0;
@@ -24,6 +28,9 @@ namespace tic_tac_toe {
     protected:
         std::vector<std::vector<T>> table_values;
 
+    /**************************************************************
+     *                     Function Definition                    *
+     *************************************************************/
     public:
         /*
          * l_rows -> Define the number of rows of the table
@@ -43,6 +50,8 @@ namespace tic_tac_toe {
 
             this->generateValueTable();
         }
+
+        virtual ~PlainTable() = default;
 
         /*
          * Return the total number of rows.
@@ -65,11 +74,11 @@ namespace tic_tac_toe {
          * UnavailableCell error will be throw.
          */
         T getCellValue(constUnShort row, constUnShort column) {
-            if (row >= this->rows || column >= this->columns) {
+            if (row > this->rows || column > this->columns) {
                 throw UnavailableCell();
             }
 
-            return this->table_values[row][column];
+            return this->table_values[row - 1][column - 1];
         }
 
         /*
@@ -90,11 +99,11 @@ namespace tic_tac_toe {
          * new_value -> new value for the cell.
          */
         void setCellValue(constUnShort row, constUnShort column, T new_value) {
-            if (row >= rows || column >= this->columns) {
+            if (row > rows || column > this->columns) {
                 throw UnavailableCell();
             }
 
-            this->table_values[row][column] = new_value;
+            this->table_values[row - 1][column - 1] = new_value;
         }
 
         /*
@@ -156,7 +165,7 @@ namespace tic_tac_toe {
             for (unsigned short row = 0; row < this->rows; ++row) {
                 this->table_values.emplace_back(std::vector<T>());
                 for (unsigned short column = 0; column < this->columns; ++column) {
-                    this->table_values[row].emplace_back(T());
+                    this->table_values[row].emplace_back(empty_value);
                 }
             }
         }
