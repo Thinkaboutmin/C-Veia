@@ -2,10 +2,13 @@
 #define TICTACTOE_CLI_TIC_TAC_TOE_H
 
 #include "../lib/tic_tac_toe/tic_tac_toe.h"
-#include "string_table.h"
 
 #include <string>
 #include <vector>
+#include<iostream>
+
+#include "string_table.h"
+#include "screen.h"
 
 using namespace tic_tac_toe;
 class CliTicTacToe : public TicTacToe<std::wstring>{
@@ -19,7 +22,7 @@ public:
     /*
      * Prints the string table.
      */
-    void showBoard();
+    CliTicTacToe & showBoard(std::wostream &out);
 };
 
 

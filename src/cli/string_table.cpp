@@ -14,7 +14,7 @@ namespace tic_tac_toe {
             for (unsigned short row_x = 1; row_x <= this->getRowsNum(); ++row_x) {
                 std::wstring downDivisor;
                 for (unsigned short column_y = 1; column_y <= this->getColumnsNum(); ++column_y) {
-                    table += L" " + getCellValue(row_x, column_y) + L" ";
+                    table += L" " + *getCellValue(row_x, column_y) + L" ";
 
                     // Verify if it is the last column meaning that there should not
                     // be a divisor for the table.

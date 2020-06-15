@@ -19,18 +19,18 @@ namespace tic_tac_toe {
 
     /**************************************************************
      *                     Variable Definition                    *
-     *************************************************************/
+     **************************************************************/
     private:
         unsigned short rows = 0;
         unsigned short columns = 0;
         T empty_value;
 
     protected:
-        std::vector<std::vector<T>> table_values;
+        std::vector<std::vector<const T *>> table_values;
 
     /**************************************************************
      *                     Function Definition                    *
-     *************************************************************/
+     **************************************************************/
     public:
         /*
          * l_rows -> Define the number of rows of the table
@@ -73,7 +73,7 @@ namespace tic_tac_toe {
          * If a row and column was given beyond the value a
          * UnavailableCell error will be throw.
          */
-        T getCellValue(constUnShort row, constUnShort column) {
+        const T * getCellValue(constUnShort row, constUnShort column) {
             if (row > this->rows || column > this->columns) {
                 throw UnavailableCell();
             }
@@ -96,14 +96,19 @@ namespace tic_tac_toe {
          *
          * row -> the row which the cell is located
          * column -> the column which the cell is located
-         * new_value -> new value for the cell.
+         * new_value -> new value for the cell. Default is empty.
          */
-        void setCellValue(constUnShort row, constUnShort column, T new_value) {
+        PlainTable<T> & setCellValue(constUnShort row, constUnShort column, const T * new_value = nullptr) {
+            if (new_value == nullptr) {
+                new_value = &this->empty_value;
+            }
             if (row > rows || column > this->columns) {
                 throw UnavailableCell();
             }
 
             this->table_values[row - 1][column - 1] = new_value;
+
+            return *this;
         }
 
         /*
@@ -113,7 +118,7 @@ namespace tic_tac_toe {
          *
          * new_columns -> new number of columns
          */
-        void setColumnsNum(constUnShort new_columns) {
+        PlainTable<T> & setColumnsNum(constUnShort new_columns) {
             if (new_columns == 0) {
                 throw ColumnIsZero();
             }
@@ -122,6 +127,8 @@ namespace tic_tac_toe {
                 unsigned short rest_columns = this->columns;
                 this->columns = new_columns;
             }
+
+            return *this;
         }
 
         /*
@@ -131,7 +138,7 @@ namespace tic_tac_toe {
          *
          * new_rows -> new number of rows.
          */
-        void setRowsNum(constUnShort new_rows) {
+        PlainTable<T> & setRowsNum(constUnShort new_rows) {
             if (new_rows == 0) {
                 throw RowIsZero();
             }
@@ -140,6 +147,8 @@ namespace tic_tac_toe {
                 unsigned short rest_rows = this->rows;
                 this->rows = new_rows;
             }
+
+            return *this;
         }
 
         /*
@@ -147,8 +156,10 @@ namespace tic_tac_toe {
          *
          * new_empty_value -> said new T empty value.
          */
-        void setEmptyValue(T new_empty_value) {
+        PlainTable<T> & setEmptyValue(T new_empty_value) {
             this->empty_value = new_empty_value;
+
+            return *this;
         }
 
     protected:
@@ -157,17 +168,19 @@ namespace tic_tac_toe {
          *
          * Remember, T type shall accept a constructor without parameter.
          */
-        void generateValueTable() {
+        PlainTable<T> & generateValueTable() {
             if (!this->table_values.empty()) {
                 this->table_values.clear();
             }
 
             for (unsigned short row = 0; row < this->rows; ++row) {
-                this->table_values.emplace_back(std::vector<T>());
+                this->table_values.emplace_back(std::vector<const T *>());
                 for (unsigned short column = 0; column < this->columns; ++column) {
-                    this->table_values[row].emplace_back(empty_value);
+                    this->table_values[row].emplace_back(&empty_value);
                 }
             }
+
+            return *this;
         }
     };
 }

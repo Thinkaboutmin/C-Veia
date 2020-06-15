@@ -1,6 +1,9 @@
 #include "cli_tic_tac_toe.h"
+
 #include <iostream>
 
-void CliTicTacToe::showBoard() {
-    std::wcout << this->cli_table->tableString();
+CliTicTacToe & CliTicTacToe::showBoard(std::wostream &out) {
+    out << this->cli_table->tableString();
+
+    return *this;
 }

@@ -12,24 +12,34 @@
 namespace tic_tac_toe {
     template<typename T>
     class AI : public Player<T> {
+
+    /**************************************************************
+     *                     Variable Definition                    *
+     **************************************************************/
     private:
         difficulty type;
 
+    /**************************************************************
+     *                     Variable Definition                    *
+     **************************************************************/
     public:
         AI(T symbol, difficulty dif = difficulty::DEFAULT) : Player<T>(symbol) {
-            if (difficultyIsValid(dif)) {
-                this->type = dif;
-            } else {
-                throw UnknownDifficulty();
-            }
+           setDifficulty(dif);
         }
 
-        void setDifficulty(difficulty dif) {
+        /*
+         * Set the difficulty which the AI will be playing as.
+         *
+         * If the difficulty is invalid an error will be thrown.
+         */
+        AI & setDifficulty(difficulty dif) {
             if (difficultyIsValid(dif)) {
                 this->type = dif;
             } else {
                 throw UnknownDifficulty();
             }
+
+            return *this;
         }
 
         const difficulty& getDifficulty() {

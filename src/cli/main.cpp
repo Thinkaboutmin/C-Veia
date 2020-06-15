@@ -1,12 +1,13 @@
 #include <string>
-#include "cli_tic_tac_toe.h"
-#include "../lib/player/ai.h"
-#include "string_table.h"
-#include "utils.h"
 #include <iostream>
 #include <locale>
 
-//using namespace tic_tac_toe;
+#include "cli_tic_tac_toe.h"
+#include "../lib/player/ai.h"
+#include "string_table.h"
+#include "screen.h"
+
+using namespace tic_tac_toe;
 int main(int argc, char ** argv) {
     // Define the locale so that wide characters are interpreted as UTF-8
     std::setlocale(LC_ALL, "");
@@ -20,12 +21,10 @@ int main(int argc, char ** argv) {
     do {
         //clearScreen();
         //setPlace(1, 1);
-        game.showBoard();
-        game.playerPlay();
-        status = game.isThereAWinner();
+        status = game.showBoard(std::wcout).playerPlay().isThereAWinner();
     } while(status == GameStatus::ONGOING);
 
-    game.showBoard();
+    game.showBoard(std::wcout);
     switch (status) {
         case GameStatus::DRAW:
             std::wcout << L"Nobody won!";

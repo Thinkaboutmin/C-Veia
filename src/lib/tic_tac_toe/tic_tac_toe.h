@@ -19,12 +19,19 @@ namespace tic_tac_toe {
      * which needs to be explicit asked.
      */
     class TicTacToe {
+
+    /**************************************************************
+     *                     Variable Definition                    *
+     **************************************************************/
     protected:
         std::vector<Player<T> *> players;
         unsigned short playerToPlay = 0;
         PlainTable<T> *table = nullptr;
         Player<T> * winner = nullptr;
 
+    /**************************************************************
+     *                     Function Definition                    *
+     **************************************************************/
     public:
         /*
          * Constructor
@@ -50,9 +57,11 @@ namespace tic_tac_toe {
             }
         }
 
-        void playerPlay() {
+        TicTacToe<T> & playerPlay() {
             PlayerMove<T> move = getNextPlayer().getMove(*table);
             table->setCellValue(move.row, move.column, move.value);
+
+            return *this;
         }
 
         // Return the next player of our vector.
@@ -78,7 +87,7 @@ namespace tic_tac_toe {
             // Check each column in a row for a horizontal win.
             for (unsigned short row = 1; row <= table->getRowsNum(); ++row) {
                 for (unsigned short column = 1; column <= table->getColumnsNum(); ++column) {
-                    T symbol = table->getCellValue(row, column);
+                    T symbol = *table->getCellValue(row, column);
                     if (symbol == table->getEmptyValue()) {
                         win = false;
                         break;
@@ -107,7 +116,7 @@ namespace tic_tac_toe {
                 // Check for each row in a column for a vertical win.
                 for (unsigned short column = 1; column <= table->getColumnsNum(); ++column) {
                     for (unsigned short row = 1; row <= table->getRowsNum(); ++row) {
-                        T symbol = table->getCellValue(row, column);
+                        T symbol = *table->getCellValue(row, column);
                         if (symbol == table->getEmptyValue()) {
                             win = false;
                             break;
@@ -131,7 +140,7 @@ namespace tic_tac_toe {
             if (!win) {
                 // Check diagonally to the left;
                 for (unsigned short col_row = 1; col_row <= table->getColumnsNum(); ++col_row) {
-                    T symbol = table->getCellValue(col_row, col_row);
+                    T symbol = *table->getCellValue(col_row, col_row);
                     if (symbol == table->getEmptyValue()) {
                         win = false;
                         break;
@@ -155,7 +164,7 @@ namespace tic_tac_toe {
             if (!win) {
                 // Check diagonally to the right;
                 for (unsigned short col_row = table->getRowsNum(); col_row != 0; --col_row) {
-                    T symbol = table->getCellValue(col_row, col_row);
+                    T symbol = *table->getCellValue(col_row, col_row);
                     if (symbol == table->getEmptyValue()) {
                         win = false;
                         break;
@@ -213,7 +222,7 @@ namespace tic_tac_toe {
         bool anyMovementAvailable() {
             for (unsigned short row = 1; row <= this->table->getRowsNum(); ++row) {
                 for (unsigned short column = 1; column <= this->table->getColumnsNum(); ++column) {
-                    if (this->table->getCellValue(row, column) == this->table->getEmptyValue()) {
+                    if (*this->table->getCellValue(row, column) == this->table->getEmptyValue()) {
                         return true;
                     }
                 }

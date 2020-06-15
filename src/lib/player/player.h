@@ -22,10 +22,17 @@ namespace tic_tac_toe {
      */
     template<typename T>
     class Player {
+
+    /**************************************************************
+     *                     Variable Definition                    *
+     **************************************************************/
     private:
         static std::list<T> players_symbols;
         T player_symbol;
 
+    /**************************************************************
+     *                     Function Definition                    *
+     **************************************************************/
     public:
        // Return the player symbol.
        const T& getPlayerSymbol() {
@@ -59,7 +66,7 @@ namespace tic_tac_toe {
             for (unsigned short row = 1; row <= table.getRowsNum(); ++row) {
                 availableCells.emplace_back(std::vector<unsigned short>());
                 for (unsigned short column = 1; column <= table.getColumnsNum(); ++column) {
-                    if (table.getCellValue(row, column) == table.getEmptyValue()) {
+                    if (*table.getCellValue(row, column) == table.getEmptyValue()) {
                         availableCells[row - 1].emplace_back(column);
                     }
                 }
