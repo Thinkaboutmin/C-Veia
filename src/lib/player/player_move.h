@@ -20,6 +20,15 @@ struct PlayerMove {
               row(row), column(column), value(&value) {}
 
     PlayerMove() = default;
+
+	void operator = (const PlayerMove<T> & move) {
+		this->column = move.column;
+		this->row = move.row;
+		this->value = move.value;
+		this->failure = move.failure;
+		this->w_msg = move.w_msg;
+		this->msg = move.msg;
+	}
 };
 
 

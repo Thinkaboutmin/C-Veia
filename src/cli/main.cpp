@@ -15,22 +15,26 @@ int main(int argc, char ** argv) {
     auto * player_1 = new AI<std::wstring>{L"X"};
     auto * player_2 = new AI<std::wstring>{L"O"};
     auto table = new StringTable{3, 3};
-    CliTicTacToe game({player_1, player_2}, table);
+    Screen screen(std::wcin, std::wcout);
+    CliTicTacToe game(screen, {player_1, player_2}, table);
 
     GameStatus status;
     do {
         //clearScreen();
         //setPlace(1, 1);
-        status = game.showBoard(std::wcout).playerPlay().isThereAWinner();
+        status = game.showBoard().playerPlay().isThereAWinner();
     } while(status == GameStatus::ONGOING);
 
-    game.showBoard(std::wcout);
+    game.showBoard();
     switch (status) {
         case GameStatus::DRAW:
             std::wcout << L"Nobody won!";
             break;
         case GameStatus::WIN:
             std::wcout << L"Player won!";
+            break;
+        case GameStatus::ONGOING:
+        default:
             break;
     }
 

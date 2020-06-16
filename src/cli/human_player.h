@@ -1,9 +1,9 @@
 #ifndef TICTACTOE_HUMAN_PLAYER_H
 #define TICTACTOE_HUMAN_PLAYER_H
 
-#include <string>
-
 #include "../lib/player/player.h"
+
+#include <string>
 
 using namespace tic_tac_toe;
 /*
@@ -19,7 +19,7 @@ public:
     PlayerMove<std::wstring> getMove(PlainTable<std::wstring> & table) override;
 
 private:
-    PlayerMove<std::wstring> parseMove(std::wstring moveString);
+    PlayerMove<std::wstring> parseMove(std::wstring ws_move);
 };
 
 

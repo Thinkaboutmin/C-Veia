@@ -1,8 +1,10 @@
 #ifndef TICTACTOE_PLAIN_TABLE_H
 #define TICTACTOE_PLAIN_TABLE_H
 
-#include <vector>
 #include "../exceptions/table/table_exceptions.h"
+
+#include <vector>
+#include <limits>
 
 namespace tic_tac_toe {
     using constUnShort = const unsigned short;
@@ -20,6 +22,10 @@ namespace tic_tac_toe {
     /**************************************************************
      *                     Variable Definition                    *
      **************************************************************/
+    public:
+        static constexpr unsigned short max_row_size = std::numeric_limits<unsigned short>::max();
+        static constexpr unsigned short max_column_size = std::numeric_limits<unsigned short>::max();
+        
     private:
         unsigned short rows = 0;
         unsigned short columns = 0;

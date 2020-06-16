@@ -1,8 +1,18 @@
 #include "screen.h"
+
 #include <vector>
 #include <string>
 #include <iostream>
 #include <limits>
+
+Screen::Screen(std::wostream & output, std::wistream & input) : output(output), input(input) {
+	this->clearScreen();
+	this->setPlace(this->cursor_row, this->cursor_column);
+}
+
+// Delegate to Screen(output, input).
+Screen::Screen(std::wistream & input, std::wostream & output) : Screen(output, input) {}
+
 
 Screen & Screen::clearLine() {
 	// Ansi clear line command.

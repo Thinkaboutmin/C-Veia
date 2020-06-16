@@ -2,8 +2,8 @@
 
 #include <iostream>
 
-CliTicTacToe & CliTicTacToe::showBoard(std::wostream &out) {
-    out << this->cli_table->tableString();
+CliTicTacToe & CliTicTacToe::showBoard() {
+    this->screen.print(this->cli_table->tableString());
 
     return *this;
 }

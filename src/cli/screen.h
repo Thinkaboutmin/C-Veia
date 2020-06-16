@@ -4,6 +4,12 @@
 #include <iostream>
 #include <string>
 
+/*
+ * A simple screen representation.
+ *
+ * It's useful to keep track of where the user cursor is and to acess ansi
+ * codes without having to retype or memorize it.
+ */
 class Screen {
 private:
     std::wostream &output;
@@ -12,13 +18,9 @@ private:
     unsigned int cursor_row = 0;
 
 public:
-    Screen(std::wistream & input, std::wostream & output) : input(input), output(output) {
-    	this->clearScreen();
-    }
+    Screen(std::wistream & input, std::wostream & output); 
 
-    Screen(std::wostream & output, std::wistream & input) : output(output), input(input) {
-		this->clearScreen();
-    }
+    Screen(std::wostream & output, std::wistream & input);
 
     /*
     * "Clear" the screen.
