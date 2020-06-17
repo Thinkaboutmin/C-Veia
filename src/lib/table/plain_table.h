@@ -108,7 +108,8 @@ namespace tic_tac_toe {
             if (new_value == nullptr) {
                 new_value = &this->empty_value;
             }
-            if (row > rows || column > this->columns) {
+            if ((row > this->rows || column > this->columns) ||
+                row == 0 || column == 0) {
                 throw UnavailableCell();
             }
 
