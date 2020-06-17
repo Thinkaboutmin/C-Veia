@@ -5,16 +5,18 @@
 
 #include <string>
 
+#include  "screen.h"
+
 using namespace tic_tac_toe;
 /*
  * A human player for the CliTicTacToe.
  */
-class HumanPlayer : Player<std::wstring> {
+class HumanPlayer : public Player<std::wstring> {
 public:
-    std::wiostream & stream;
+    Screen & screen;
 
 public:
-    HumanPlayer(std::wstring symbol, std::wiostream & stream);
+    HumanPlayer(std::wstring symbol, Screen & screen);
 
     PlayerMove<std::wstring> getMove(PlainTable<std::wstring> & table) override;
 

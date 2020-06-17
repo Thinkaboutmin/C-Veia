@@ -25,8 +25,8 @@ Screen & Screen::clearLine() {
 Screen & Screen::clearScreen() {
 	// Ansi clear screen command.
 	this->output << L"\033[2J";
-	this->cursor_column = 0;
-	this->cursor_row = 0;
+	this->cursor_column = 1;
+	this->cursor_row = 1;
 	this->setPlace(this->cursor_row, this->cursor_column);
 
 	return *this;
@@ -56,6 +56,7 @@ Screen & Screen::print(const std::wstring &string) {
 	size_t index = 0;
 
 	while (true) {
+		size_t last_index = index;
 		index = string.find(L'\n', index);
 
 		if (index != max_size) {
@@ -63,6 +64,7 @@ Screen & Screen::print(const std::wstring &string) {
 			// Each new line is a new row, right?
 			++this->cursor_row;
 		} else {
+			index = last_index;
 			break;
 		}
 	}

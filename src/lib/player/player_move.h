@@ -13,8 +13,8 @@ struct PlayerMove {
         unsigned short b_row = 0;
         unsigned short b_column = 0;
     public:
-        const unsigned short row = b_row;
-        const unsigned short column = b_column;
+        const unsigned short &row = b_row;
+        const unsigned short &column = b_column;
         const T *value = nullptr;
         bool failure = false;
         std::string msg;

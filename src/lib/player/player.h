@@ -35,7 +35,7 @@ namespace tic_tac_toe {
      **************************************************************/
     public:
        // Return the player symbol.
-       const T& getPlayerSymbol() {
+       const T& getPlayerSymbol() const {
            return this->player_symbol;
        }
 

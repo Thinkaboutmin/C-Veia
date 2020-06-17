@@ -4,6 +4,7 @@
 
 #include "cli_tic_tac_toe.h"
 #include "../lib/player/ai.h"
+#include "human_player.h"
 #include "string_table.h"
 #include "screen.h"
 
@@ -12,15 +13,15 @@ int main(int argc, char ** argv) {
     // Define the locale so that wide characters are interpreted as UTF-8
     std::setlocale(LC_ALL, "");
 
-    auto * player_1 = new AI<std::wstring>{L"X"};
-    auto * player_2 = new AI<std::wstring>{L"O"};
-    auto table = new StringTable{3, 3};
     Screen screen(std::wcin, std::wcout);
+    auto * player_1 = new AI<std::wstring>{L"X"};
+    auto * player_2 = new HumanPlayer{L"O", screen};
+    auto table = new StringTable{3, 3};
     CliTicTacToe game(screen, {player_1, player_2}, table);
 
     GameStatus status;
     do {
-        //clearScreen();
+        screen.clearScreen();
         //setPlace(1, 1);
         status = game.showBoard().playerPlay().isThereAWinner();
     } while(status == GameStatus::ONGOING);
@@ -31,7 +32,7 @@ int main(int argc, char ** argv) {
             std::wcout << L"Nobody won!";
             break;
         case GameStatus::WIN:
-            std::wcout << L"Player won!";
+            std::wcout << L"Player " << game.getWinner()->getPlayerSymbol() << "won!";
             break;
         case GameStatus::ONGOING:
         default:

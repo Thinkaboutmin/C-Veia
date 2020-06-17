@@ -4,22 +4,24 @@
 #include <string>
 #include <limits>
 
-HumanPlayer::HumanPlayer(std::wstring symbol, std::wiostream & stream) : Player(symbol), stream(stream) {}
+HumanPlayer::HumanPlayer(std::wstring symbol, Screen & screen) : Player(symbol), screen(screen) {}
 
 PlayerMove<std::wstring> HumanPlayer::getMove(PlainTable<std::wstring> &table) {
-    unsigned int col_write = table.getRowsNum();
-    this->stream << L"\n\n";
-    col_write += 2;
+    this->screen.print(L"\n\n");
 
     PlayerMove<std::wstring> player_move;
     do {
         if (player_move.failure) {
-            this->stream << L"\n" << player_move.w_msg;
+			this->screen.setPlace(this->screen.getRow() + 2, 0).clearLine().print(player_move.w_msg);
+			// Reset to the last row otherwise it will shift down
+			// because enter means a newline.
+			this->screen.setPlace(this->screen.getRow() - 3, 0).clearLine();
         }
 
-        this->stream << L"Select the place where you want to play by giving row|column: ";
-        std::wstring move;
-        std::getline(this->stream, move);
+		this->screen.print(L"Select the place where you want to play by giving row|column: ");
+        
+        std::wstring move = this->screen.getLine();
+		
         player_move = this->parseMove(move);
     } while(player_move.failure);
 
@@ -35,12 +37,12 @@ PlayerMove<std::wstring> HumanPlayer::parseMove(std::wstring string) {
 		PlayerMove<std::wstring> move;
 		move.failure = true;
 		move.w_msg = L"Couldn't find the pipe (|) to separate from column to cell";
-		return PlayerMove<std::wstring>();
+		return move;
 	// If the size is the same as the pipe then assume that
 	// it's the last character of a string which size is bigger than the pipe
 	// hence no value for column. itself or that's missing the 
 	// 
-	} else if (sep_found == string.size() - 1) {
+	} else if (sep_found == (string.size() - 1)) {
 		PlayerMove<std::wstring> move;
 		move.failure = true;
 		if (string.size() == 1) {
@@ -55,6 +57,7 @@ PlayerMove<std::wstring> HumanPlayer::parseMove(std::wstring string) {
 		PlayerMove<std::wstring> move;
 		move.failure = true;
 		move.w_msg = L"Missing row value";
+		return move;
 	}
 
 	// Remove any minus sign.
@@ -64,7 +67,7 @@ PlayerMove<std::wstring> HumanPlayer::parseMove(std::wstring string) {
 			break;
 		}
 
-		string.erase(string.begin() + minus_found);
+		string.erase(minus_found);
 	}
 
 	// Safely verify if there's an error when parsing the row and column string.
@@ -102,7 +105,7 @@ PlayerMove<std::wstring> HumanPlayer::parseMove(std::wstring string) {
 		return move;
 	}
 
-	PlayerMove<std::wstring> move;
+	PlayerMove<std::wstring> move(row, column, this->getPlayerSymbol());
 
-	return PlayerMove<std::wstring>();
+	return move;
 }

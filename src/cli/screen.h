@@ -14,8 +14,8 @@ class Screen {
 private:
     std::wostream &output;
     std::wistream &input;
-    unsigned int cursor_column = 0;
-    unsigned int cursor_row = 0;
+    unsigned int cursor_column = 1;
+    unsigned int cursor_row = 1;
 
 public:
     Screen(std::wistream & input, std::wostream & output); 
