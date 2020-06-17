@@ -16,5 +16,4 @@ terminal which supports ansi escapes.
 * Possibility to play it online (why not? :P) 
 * Implement an OpenGl playable interface
 * Implement a Vulkan playable interface
-* Construct an easier to work around class objects
-* The most important, learn the language and new things.
+* ~Construct an easier to work around class objects~ Kind of hard...
