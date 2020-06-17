@@ -9,21 +9,25 @@
  */
 template<typename T>
 struct PlayerMove {
-    const unsigned short row = 0;
-    const unsigned short column = 0;
-    const T *value = nullptr;
-    bool failure = false;
-    std::string msg;
-    std::wstring w_msg;
+    private:
+        unsigned short b_row = 0;
+        unsigned short b_column = 0;
+    public:
+        const unsigned short row = b_row;
+        const unsigned short column = b_column;
+        const T *value = nullptr;
+        bool failure = false;
+        std::string msg;
+        std::wstring w_msg;
 
     PlayerMove(const unsigned short row, const unsigned short column, const T &value) :
-              row(row), column(column), value(&value) {}
+              b_row(row), b_column(column), value(&value) {}
 
     PlayerMove() = default;
 
-	void operator = (const PlayerMove<T> & move) {
-		this->column = move.column;
-		this->row = move.row;
+	void operator = (PlayerMove<T> move) {
+		this->b_column = move.column;
+		this->b_row = move.row;
 		this->value = move.value;
 		this->failure = move.failure;
 		this->w_msg = move.w_msg;
