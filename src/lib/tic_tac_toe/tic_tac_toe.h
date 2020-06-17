@@ -77,10 +77,6 @@ namespace tic_tac_toe {
 
         // Verifies for the given table for a winner.
         GameStatus isThereAWinner() {
-            if (!anyMovementAvailable()) {
-                return GameStatus::DRAW;
-            }
-
             T checkSymbol = table->getEmptyValue();
 
             bool win = false;
@@ -104,12 +100,12 @@ namespace tic_tac_toe {
                     }
                 }
 
-                if (win) {
-                    this->winner = TicTacToe::checkSymbolForPlayer(checkSymbol);
-                    return GameStatus::WIN;
+                if (!win) {
+                    // Renew symbol to empty one
+                    checkSymbol = table->getEmptyValue();
+                } else {
+                    break;
                 }
-                // Renew symbol to empty one.
-                checkSymbol = table->getEmptyValue();
             }
 
             if (!win) {
@@ -132,8 +128,13 @@ namespace tic_tac_toe {
                             break;
                         }
                     }
-                    // Renew symbol to empty one.
+
+                    if (!win) {
+                    // Renew symbol to empty one
                     checkSymbol = table->getEmptyValue();
+                    } else {
+                        break;
+                    }
                 }
             }
 
@@ -157,8 +158,10 @@ namespace tic_tac_toe {
                     }
                 }
 
-                // Renew symbol to empty one
-                checkSymbol = table->getEmptyValue();
+                if (!win) {
+                    // Renew symbol to empty one
+                    checkSymbol = table->getEmptyValue();
+                }
             }
 
             if (!win) {
@@ -185,6 +188,8 @@ namespace tic_tac_toe {
             if (win) {
                 this->winner = TicTacToe::checkSymbolForPlayer(checkSymbol);
                 return GameStatus::WIN;
+            } else if (!anyMovementAvailable()) {
+                return GameStatus::DRAW;
             }
 
             return GameStatus::ONGOING;

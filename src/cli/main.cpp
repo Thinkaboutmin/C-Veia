@@ -26,13 +26,14 @@ int main(int argc, char ** argv) {
         status = game.showBoard().playerPlay().isThereAWinner();
     } while(status == GameStatus::ONGOING);
 
+    screen.clearScreen();
     game.showBoard();
     switch (status) {
         case GameStatus::DRAW:
             std::wcout << L"Nobody won!";
             break;
         case GameStatus::WIN:
-            std::wcout << L"Player " << game.getWinner()->getPlayerSymbol() << "won!";
+            std::wcout << L"Player " << game.getWinner()->getPlayerSymbol() << " won!";
             break;
         case GameStatus::ONGOING:
         default:

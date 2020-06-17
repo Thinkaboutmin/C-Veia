@@ -22,6 +22,9 @@ public:
 
 private:
     PlayerMove<std::wstring> parseMove(std::wstring ws_move);
+
+    PlayerMove<std::wstring> checkIfMoveIsValid(PlayerMove<std::wstring> move, PlainTable<std::wstring> &table,
+                                                std::vector<std::vector<unsigned short>> & available_moves);
 };
 
 

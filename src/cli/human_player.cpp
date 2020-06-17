@@ -9,6 +9,7 @@ HumanPlayer::HumanPlayer(std::wstring symbol, Screen & screen) : Player(symbol),
 PlayerMove<std::wstring> HumanPlayer::getMove(PlainTable<std::wstring> &table) {
     this->screen.print(L"\n\n");
 
+ 	std::vector<std::vector<unsigned short>> available_moves = Player<std::wstring>::getAvailableMoves(table);
     PlayerMove<std::wstring> player_move;
     do {
         if (player_move.failure) {
@@ -23,6 +24,13 @@ PlayerMove<std::wstring> HumanPlayer::getMove(PlainTable<std::wstring> &table) {
         std::wstring move = this->screen.getLine();
 		
         player_move = this->parseMove(move);
+		// Jump to the start if there's a failure.
+		if (player_move.failure) {
+			continue;
+		}
+
+		// Check if it conflicts with the table values.
+		player_move = this->checkIfMoveIsValid(player_move, table, available_moves);
     } while(player_move.failure);
 
     return player_move;
@@ -38,11 +46,12 @@ PlayerMove<std::wstring> HumanPlayer::parseMove(std::wstring string) {
 		move.failure = true;
 		move.w_msg = L"Couldn't find the pipe (|) to separate from column to cell";
 		return move;
+	 
+	}
 	// If the size is the same as the pipe then assume that
 	// it's the last character of a string which size is bigger than the pipe
-	// hence no value for column. itself or that's missing the 
-	// 
-	} else if (sep_found == (string.size() - 1)) {
+	// hence no value for column.
+	else if (sep_found == (string.size() - 1)) {
 		PlayerMove<std::wstring> move;
 		move.failure = true;
 		if (string.size() == 1) {
@@ -108,4 +117,40 @@ PlayerMove<std::wstring> HumanPlayer::parseMove(std::wstring string) {
 	PlayerMove<std::wstring> move(row, column, this->getPlayerSymbol());
 
 	return move;
+}
+
+PlayerMove<std::wstring> HumanPlayer::checkIfMoveIsValid(PlayerMove<std::wstring> move, PlainTable<std::wstring> & table,
+								std::vector<std::vector<unsigned short>> & available_moves) {
+	if (move.row == 0) {
+			move.failure = true;
+			move.w_msg = L"Row needs to be bigger than zero.";
+			return move;
+		} else if (move.column == 0) {
+			move.failure = true;
+			move.w_msg = L"Column needs tp be bigger than zero.";
+			return move;
+		} else if (move.row > table.getRowsNum()) {
+			move.failure = true;
+			move.w_msg = L"Value is too big for row.";
+			return move;
+		} else if (move.column > table.getColumnsNum()) {
+			move.failure = true;
+			move.w_msg = L"Value is too big for column";
+			return move;
+		}
+
+		bool played_cell = true;
+		for (const unsigned short & column : available_moves[move.row - 1]) {
+			if (column == move.column) {
+				played_cell = false;
+				break;
+			}
+		}
+
+		if (played_cell) {
+			move.failure = true;
+			move.w_msg = L"The desired place already have a mark. Choose another.";
+		}
+
+		return move;
 }
