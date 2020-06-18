@@ -166,8 +166,8 @@ namespace tic_tac_toe {
 
             if (!win) {
                 // Check diagonally to the right;
-                for (unsigned short col_row = table->getRowsNum(); col_row != 0; --col_row) {
-                    T symbol = *table->getCellValue(col_row, col_row);
+                for (unsigned short row = table->getRowsNum(), column = 1; row != 0; --row, ++column) {
+                    T symbol = *table->getCellValue(row, column);
                     if (symbol == table->getEmptyValue()) {
                         win = false;
                         break;
