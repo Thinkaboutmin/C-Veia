@@ -74,9 +74,84 @@ Screen & Screen::print(const std::wstring &string) {
 	return *this;
 }
 
-Screen & Screen::setPlace(const unsigned int row, const unsigned int column) {
-	this->cursor_row = row;
+Screen & Screen::setPlace(unsigned int row, unsigned int column) {
+	// Do not accept 0 row and column.
+	row = !row ? 1: row;
+	column = !column ? 1 : column;
+	this->cursor_row = row; 
 	this->cursor_column = column;
-	this->output << L"\033[" << row << L";" << column << L"H";
+	this->output << L"\033[" << this->cursor_row << L";" << this->cursor_column << L"H";
+	return *this;
+}
+
+Screen & Screen::print(const int & number) {
+	std::wstring s_number = std::to_wstring(number);
+
+	this->output << s_number;
+	this->cursor_column = s_number.size();
+
+	return *this;
+}
+
+int Screen::getInt() {
+	unsigned int column = this->cursor_column;
+	unsigned int row = this->cursor_row;
+	
+	int number = 0;
+	bool had_error = false;
+	unsigned int number_length = 0;
+	do {
+		std::wstring s_number = this->getLine();
+		number_length = s_number.size();
+		try {
+			number = std::stoi(s_number);
+			break;
+		} catch(std::invalid_argument & _) {
+			this->print(L"\n\n");
+			this->clearLine();
+			this->print(L"Type a number");
+			this->setPlace(row, 1).clearColumnRange(column, column + number_length);
+			had_error = true;
+			continue;
+		} catch(std::out_of_range & _) {
+			this->print(L"\n\n");
+			this->clearLine();
+			this->print(L"Invalid number range");
+			this->setPlace(row, 1).clearColumnRange(column, column + number_length);
+			had_error = true;			
+			continue;
+		}
+	} while (true);
+
+	if (had_error) {
+		column = this->cursor_column;
+		row = this->cursor_row;
+		this->setPlace(row + 2, 1);
+		this->clearLine();
+		this->setPlace(row, column);
+	}
+
+	return number;
+}
+
+Screen & Screen::clearColumnRange(unsigned int column_x, unsigned int column_y) {
+	column_x = !column_x ? 1 : column_x;
+	column_y = !column_y ? 1 : column_y;
+
+	unsigned int dif = 0;
+	
+	if (column_y >= column_x) {
+		this->setPlace(this->cursor_row, column_x);
+		dif = column_y - column_x + 1;
+	} else {
+		this->setPlace(this->cursor_row, column_y);
+		dif = column_x - column_y + 1;
+	}
+
+	std::wstring spaces;
+	spaces.insert(spaces.begin(), dif, L' ');
+	this->output << spaces;
+	this->setPlace(this->cursor_row, column_x);
+
 	return *this;
 }

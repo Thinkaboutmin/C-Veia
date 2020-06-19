@@ -71,9 +71,26 @@ public:
 	std::wstring getLine();
 
 	/*
+	* Get an intenger from the input stream.
+	*/
+	int getInt();
+
+	/*
 	 * Prints a string on the output stream.
 	 */
 	Screen & print(const std::wstring &string);
+
+	/*
+	* Print an integer to the output stream.
+	*/
+	Screen & print(const int & number);
+
+	/*
+	* Clear a column range with spaces.
+	*
+	* The cursor position will be set on column_x after the clean.
+	*/
+	Screen & clearColumnRange(unsigned int column_x, unsigned int column_y);
 };
 
 #endif //TICTACTOE_SCREEN_H
