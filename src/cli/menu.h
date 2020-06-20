@@ -14,17 +14,51 @@ using namespace tic_tac_toe;
 class Menu {
 private:
     Screen & screen;
-public:
+    std::vector<Player<std::wstring> *> players;
+    StringTable * table = nullptr;
 
+public:
     Menu(Screen & screen);
 
+    /*
+    * Ask for the mode which the game will be played.
+    * 
+    * It will return a default or customized or any other added.
+    */
     MenuOption askForMode();
 
-    std::vector<Player<std::wstring> *> askForPlayers();
+    /*
+    * Ask for the user to type the customization of their game.
+    */
+    Menu & customizationMenu();
 
-    StringTable askForTable();
+    /*
+    * Return the players chosen by the user and delete it from the class.
+    */
+    std::vector<Player<std::wstring> *> getPlayers();
 
-    const std::vector<Player<std::wstring> *> defaultPlayers();
+    /*
+    * Return the table created by the user and delte it from the class.
+    */
+    StringTable * getTable();
+    
+private:
+
+    Menu & playersMenu();
+
+    Menu & addPlayer();
+
+    Menu & deletePlayer();
+
+    Menu & changePlayerSymbol();
+
+    Menu & changePlayerOrder();
+
+    Menu & tableMenu();
+
+    void printPlayers();
+
+    void unknownOptionMsg(const unsigned int & row);
 };
 
 #endif
