@@ -69,7 +69,7 @@ Screen & Screen::print(const std::wstring &string) {
 		}
 	}
 
-	this->cursor_column = string.size() - index;
+	this->cursor_column = string.size() - index + 1;
 
 	return *this;
 }
@@ -88,7 +88,7 @@ Screen & Screen::print(const int & number) {
 	std::wstring s_number = std::to_wstring(number);
 
 	this->output << s_number;
-	this->cursor_column = s_number.size();
+	this->cursor_column = s_number.size() + 1;
 
 	return *this;
 }
