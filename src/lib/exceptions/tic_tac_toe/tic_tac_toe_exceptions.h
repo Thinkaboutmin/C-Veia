@@ -7,18 +7,18 @@
 #define TABLE_IS_NOT_EQUAL_IN_SIDES_MSG "The number os rows and columns need to be equal."
 #define EMPTY_VALUE_CONFLICT_MSG "The empty value is conflicting with some player symbol."
 
-class NotEnoughPlayers : std::runtime_error {
+class NotEnoughPlayers : public std::runtime_error {
 public:
     NotEnoughPlayers() : std::runtime_error(NOT_ENOUGH_PLAYERS_MSG){}
 };
 
 
-class TableIsNotEqualInSides : std::runtime_error {
+class TableIsNotEqualInSides : public std::runtime_error {
 public:
     TableIsNotEqualInSides() : std::runtime_error(TABLE_IS_NOT_EQUAL_IN_SIDES_MSG){}
 };
 
-class EmptyValueConflict : std::runtime_error {
+class EmptyValueConflict : public std::runtime_error {
 public:
     EmptyValueConflict() : std::runtime_error(EMPTY_VALUE_CONFLICT_MSG){}
 };

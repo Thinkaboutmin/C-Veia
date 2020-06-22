@@ -8,17 +8,17 @@
 #define COLUMN_IS_ZERO_MSG "Column number needs to be bigger than zero"
 
 namespace tic_tac_toe {
-    class UnavailableCell : std::runtime_error {
+    class UnavailableCell : public std::runtime_error {
     public:
         UnavailableCell() : std::runtime_error(UNAVAILABLE_CELL_MSG) {}
     };
 
-    class RowIsZero : std::runtime_error {
+    class RowIsZero : public std::runtime_error {
     public:
         RowIsZero() : std::runtime_error(ROW_IS_ZERO_MSG){}
     };
 
-    class ColumnIsZero : std::runtime_error {
+    class ColumnIsZero : public std::runtime_error {
     public:
         ColumnIsZero() : std::runtime_error(COLUMN_IS_ZERO_MSG){}
     };
