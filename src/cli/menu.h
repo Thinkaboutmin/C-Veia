@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <array>
 
 #include "../lib/player/player.h"
 #include "menu_enum.h"
@@ -59,6 +60,9 @@ private:
     void printPlayers();
 
     void unknownOptionMsg(const unsigned int & row);
+
+    template<size_t t>
+    void printOptions(std::array<std::wstring, t> & options);
 };
 
 #endif

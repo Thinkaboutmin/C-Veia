@@ -1,4 +1,7 @@
 #include "menu.h"
+#include "human_player.h"
+#include "../lib/player/ai.h"
+
 #include <utility>
 #include <array>
 #include <functional>
@@ -59,15 +62,13 @@ StringTable * Menu::getTable() {
 Menu & Menu::customizationMenu() {
     this->screen.clearScreen();
 
-    std::array<std::wstring, 2> options = {
+    std::array<std::wstring, 3> options = {
         L"Player menu",
-        L"Table menu"
+        L"Table menu",
         L"Proceed to game"
     };
 
-    for (int i = 0; i < options.size(); ++i) {
-        this->screen.print(i + 1).print(L" - " + options[i] + L"\n");
-    }
+    Menu::printOptions<3>(options);
 
     this->screen.print(select_msg);
     unsigned row = this->screen.getRow();
@@ -108,6 +109,8 @@ Menu & Menu::customizationMenu() {
 }
 
 Menu & Menu::playersMenu() {
+    this->screen.clearScreen();
+
     std::array<std::wstring, 5> options {
         L"Add player",
         L"Change player symbol",
@@ -116,9 +119,7 @@ Menu & Menu::playersMenu() {
         L"Back to game menu"
     };
 
-    for (int i = 0; i < options.size(); ++i) {
-        this->screen.print(i + 1).print(L" - " + options[i] + L"\n");
-    }
+    Menu::printOptions<5>(options);
 
     this->screen.print(select_msg);
     unsigned int row = this->screen.getRow();
@@ -151,32 +152,230 @@ Menu & Menu::playersMenu() {
 
 Menu & Menu::addPlayer() {
     this->screen.clearScreen();
-    this->printPlayers();
 
+    std::array<std::wstring, 3> options {
+        L"Human player (played by users)",
+        L"AI Player (played by the computer)",
+        L"Go back to player menu"
+    };
 
+    Menu::printOptions<3>(options);
+
+    this->screen.print(select_msg);
+    unsigned int row = this->screen.getRow();
+    int option = this->screen.getInt();
+
+    while(true) {
+        switch(option) {
+            case 1:
+            case 2:
+                break;
+            case 3:
+                return this->playersMenu();
+                break;
+            default:
+                this->unknownOptionMsg(row);
+                option = this->screen.getInt();
+                continue;
+
+        }
+
+        break;
+    }
+
+    this->screen.clearScreen().print(L"Type the symbol for player: ");
+    row = this->screen.getRow();
+    unsigned int column = this->screen.getColumn();
     
-    return *this;
+    do {
+        std::wstring symbol = this->screen.getLine();
+        Player<std::wstring> * player = nullptr;
+        try {
+            if (option == 1) {
+                player = new HumanPlayer(symbol, this->screen);
+            } else {
+                player = new AI<std::wstring>(symbol);
+            }
+
+            this->players.emplace_back(player);
+            break;
+        } catch(UnusableSymbol & error) {
+            this->screen.print(L"\n\n").clearLine().print(UNUSABLE_SYMBOL_WMSG);
+            this->screen.setPlace(row, column);
+            continue;
+        }
+    } while(true);
+
+    this->screen.clearScreen();
+    this->printPlayers();
+    this->screen.print(L"Player created with success. Enter to go back to player menu\n");
+    this->screen.getLine();
+    
+    return this->playersMenu();
 }
 
 Menu & Menu::deletePlayer() {
     this->screen.clearScreen();
-    this->printPlayers();
 
-    return *this;
+    this->printPlayers();
+    if (this->players.empty()) {
+        this->screen.print(L"Press enter to go back to player menu");
+        this->screen.getLine();
+        return this->playersMenu();
+    } else {
+        this->screen.setPlace(this->screen.getRow() - 1, 0).print(L"-1 - go back to menu\n\n");
+    }
+
+    std::wstring msg = L"Select a player number (order) to delete: ";
+    this->screen.print(msg);
+    unsigned int row = this->screen.getRow();
+    do {
+        int option = this->screen.getInt();
+        if (option == -1) {
+            break;
+        }
+
+        if (option > this->players.size() || option == 0) {
+            this->screen.setPlace(row + 2, 0).clearLine().print(L"Player not found at ").print(option);
+            this->screen.setPlace(row, 0).clearLine().print(msg);
+            continue;
+        }
+
+        delete this->players[option - 1];
+        this->players.erase(this->players.begin() + (option - 1));
+        this->screen.clearScreen();
+        this->printPlayers();
+        this->screen.print(L"Player deleted with success. Press enter to go back to player menu\n");
+        this->screen.getLine();
+        break;
+    } while(true);
+
+    return this->playersMenu();
 }
 
 Menu & Menu::changePlayerSymbol() {
     this->screen.clearScreen();
-    this->printPlayers();
 
-    return *this;
+    this->printPlayers();
+    if (this->players.empty()) {
+        this->screen.print(L"Press enter to go back to player menu");
+        this->screen.getLine();
+        return this->playersMenu();
+    } else {
+        this->screen.setPlace(this->screen.getRow() - 1, 0).print(L"-1 - go back to menu\n\n");
+    }
+
+    std::wstring msg = L"Select a player number (order) to change symbol: ";
+    this->screen.print(msg);
+    unsigned int row = this->screen.getRow();
+    int option = 0;
+    do {
+        option = this->screen.getInt();
+        if (option == -1) {
+            break;
+        }
+
+        if (option > this->players.size() || option == 0) {
+            this->screen.setPlace(row + 2, 0).clearLine().print(L"Player not found at ").print(option);
+            this->screen.setPlace(row, 0).clearLine().print(msg);
+            continue;
+        }
+
+        break;
+    } while(true);
+
+    Player<std::wstring> & player = *this->players[option - 1];
+    this->screen.clearScreen();
+    this->screen.print(L"Actual player symbol: " + player.getPlayerSymbol() + L"\n");
+    msg = L"New player symbol: ";
+    this->screen.print(L"New player symbol: ");
+    row = this->screen.getRow();
+    do {
+        std::wstring symbol = this->screen.getLine();
+        try {
+            player.setPlayerSymbol(symbol);
+        } catch(UnusableSymbol & _) {
+            this->screen.print(L"\n\n").clearLine().print(UNUSABLE_SYMBOL_WMSG);
+            this->screen.setPlace(row, 0).clearLine().print(msg);
+            continue;
+        }
+
+        break;
+    } while(true);
+
+    this->screen.clearScreen();
+    this->printPlayers();
+    this->screen.print(L"Player symbol changed with success. Press enter to go back to player menu\n");
+    this->screen.getLine();
+
+    return this->playersMenu();
 }
 
 Menu & Menu::changePlayerOrder() {
     this->screen.clearScreen();
+
     this->printPlayers();
 
-    return *this;
+    if (this->players.empty()) {
+        this->screen.print(L"Press enter to go back to player menu");
+        this->screen.getLine();
+        return this->playersMenu();
+    } else {
+        this->screen.setPlace(this->screen.getRow() - 1, 0).print(L"-1 - go back to menu\n\n");
+    }
+
+    std::wstring msg = L"Select a player number (order) to change player order: ";
+    this->screen.print(msg);
+    unsigned int row = this->screen.getRow();
+    int option = 0;    
+    do {
+        option = this->screen.getInt();
+        if (option == -1) {
+            break;
+        }
+
+        if (option > this->players.size() || option == 0) {
+            this->screen.setPlace(row + 2, 0).clearLine().print(L"Player not found at ").print(option);
+            this->screen.setPlace(row, 0).clearLine().print(msg);
+            continue;
+        }
+
+        break;
+    } while(true);
+
+    // Pick the other player to exchange place.
+    this->screen.clearScreen();
+    this->printPlayers();
+    this->screen.setPlace(this->screen.getRow() - 1, 0).print(L"-1 - go back to menu\n\n");
+
+    msg = L"Select a player number (order) to change player order: ";
+    this->screen.print(msg);
+    row = this->screen.getRow();
+    int option_2 = 0;    
+    do {
+        option_2 = this->screen.getInt();
+        if (option_2 == -1) {
+            break;
+        }
+
+        if (option_2 > this->players.size() || option_2 == 0) {
+            this->screen.setPlace(row + 2, 0).clearLine().print(L"Player not found at ").print(option);
+            this->screen.setPlace(row, 0).clearLine().print(msg);
+            continue;
+        }
+
+        break;
+    } while(true);
+
+    if (option_2 != option) {
+        std::swap(this->players[option -1], this->players[option_2 - 1]);
+    }
+
+    this->screen.clearScreen();
+    this->printPlayers();
+    this->screen.print(L"Order ").print(option).print(L" changed to ").print(option_2).print(L" with success. Press enter to go back to player menu");
+    this->screen.getLine();
+    return this->playersMenu();
 }
 
 Menu & Menu::tableMenu() {
@@ -202,4 +401,12 @@ void Menu::printPlayers() {
         }
         this->screen.print(L"\n");
     }
+}
+
+template<size_t t>
+void Menu::printOptions(std::array<std::wstring, t> & options) {
+    for (int i = 0; i < options.size(); ++i) {
+        this->screen.print(i + 1).print(L" - " + options[i] + L"\n");
+    }
+    this->screen.print(L"\n");
 }
