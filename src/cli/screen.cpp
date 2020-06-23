@@ -17,7 +17,7 @@ Screen::Screen(std::wistream & input, std::wostream & output) : Screen(output, i
 Screen & Screen::clearLine() {
 	// Ansi clear line command.
 	this->output << L"\033[2K";
-	this->cursor_column = 0;
+	this->cursor_column = 1;
 	this->setPlace(this->cursor_row, this->cursor_column);
 	return *this;
 }
