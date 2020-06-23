@@ -12,7 +12,7 @@ terminal which supports ansi escapes.
 * Implement a CLI playable interface - Partially
   * AI - Partially done, only easy difficulty works (pure rng)
   * Cli player - Done
-  * Menu - WIP
+  * Menu - Done (missing only a few checks)
 * Possibility to play it online (why not? :P) 
 * Implement an OpenGl playable interface
 * Implement a Vulkan playable interface
