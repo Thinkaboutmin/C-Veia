@@ -3,11 +3,11 @@ A simple Tic Tac Toe (also known as Jogo da Velha on my country)
 
 # Gameplay
 
-![alt text](https://github.com/Thinkaboutmin/AStupidRobot-USELESS-/blob/master/gif/play_game.gif)
+![alt text](https://github.com/Thinkaboutmin/C-Veia/blob/master/gif/play_game.gif)
 
 # Customization
 
-![alt text](https://github.com/Thinkaboutmin/AStupidRobot-USELESS-/blob/master/gif/game_custom.gif)
+![alt text](https://github.com/Thinkaboutmin/C-Veia/blob/master/gif/game_custom.gif)
 
 # Pre-Requisites
 ```
