@@ -77,17 +77,19 @@ private:
 
     Menu & tableMenu();
 
-    void printPlayers();
+    Menu & setTableColumnAndRow();
 
-    void unknownOptionMsg(const unsigned int & row);
+    Menu & showTablePreview();
+
+    void printPlayers();
 
     /*
     * Prints an error in a default way.
-    * msg -> Message to be printed.
-    * row -> Row before an input.
-    * column -> column to go back in relation to the actual one. 
+    * entry_msg -> Message which got the input from.
+    * error_msg -> Message to display below
+    * row -> Row of where the entry_msg was displayed.
     */
-    void errorMsgPrint(const std::wstring & msg, const unsigned int & row, const unsigned int & column);
+    void errorMsgPrint(const std::wstring & entry_msg, const std::wstring error_msg, const unsigned int & row);
 
     /*
     * Print an array in a default way.

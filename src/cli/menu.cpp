@@ -8,6 +8,7 @@
 #include <utility>
 
 const std::wstring select_msg {L"Please, select an option: "};
+const std::wstring unknown_option {L"Unknown option was given, choose a valid one"};
 
 Menu::Menu(Screen & screen) : screen(screen) {}
 
@@ -25,14 +26,13 @@ MenuOption Menu::askForMode() {
     this->screen.print(static_cast<int>(default_mode.first)).print(L" - ").print(default_mode.second).print(L"\n");
     this->screen.print(static_cast<int>(customized_mode.first)).print(L" - ").print(customized_mode.second).print(L"\n");
 
-    this->screen.print(L"Select a number for a mode: ");
+    const std::wstring msg = L"Select a number for a mode: ";
+    this->screen.print(msg);
     unsigned int column = this->screen.getColumn();
     unsigned int row = this->screen.getRow();
     int mode = this->screen.getInt();
     while (mode <= 0 || mode >= static_cast<int>(MenuOption::TOTAL)) {
-        this->screen.print(L"\n\n").clearLine().print(L"Invalid number for option");
-        // Can't know how many characters were given by the user hence we clear the entire line.
-        this->screen.setPlace(row, column).clearLine().print(L"Select a number for a mode: ");
+        this->errorMsgPrint(msg, L"Invalid number for option", row);
         mode = this->screen.getInt();
     }
 
@@ -85,19 +85,15 @@ Menu & Menu::customizationMenu() {
                 break;
             case 3:
                 if (this->players.empty()) {
-                    this->screen.setPlace(this->screen.getRow() + 2, 0).clearLine();
-                    this->screen.print(L"No player(s) was(were) added");
-                    this->screen.setPlace(row, 0).clearLine().print(select_msg);
+                    this->errorMsgPrint(select_msg, L"No player(s) was(were) added", row);
                     continue;
                 } else if(this->table == nullptr) {
-                    this->screen.setPlace(this->screen.getRow() + 2, 0).clearLine();
-                    this->screen.print(L"No table row and column was set");
-                    this->screen.setPlace(row, 0).clearLine().print(select_msg);
+                    this->errorMsgPrint(select_msg, L"No table row and column was set", row);
                     continue;
                 }
                 break;
             default:
-                this->unknownOptionMsg(row);
+                this->errorMsgPrint(select_msg, unknown_option, row);
                 continue;
                 break;
         }
@@ -123,8 +119,10 @@ Menu & Menu::playersMenu() {
 
     this->screen.print(select_msg);
     unsigned int row = this->screen.getRow();
-    int option = this->screen.getInt();
+    int option = 0;
     while(true) {
+        option = this->screen.getInt();
+
         switch(option) {
             case 1:
                 return this->addPlayer();
@@ -142,10 +140,11 @@ Menu & Menu::playersMenu() {
                 return this->customizationMenu();
                 break;
             default:
-                this->unknownOptionMsg(row);
-                option = this->screen.getInt();
+                this->errorMsgPrint(select_msg, unknown_option, row);
                 continue;
         }
+
+        break;
     }
     return *this;
 }
@@ -164,9 +163,10 @@ Menu & Menu::addPlayer() {
     this->screen.print(select_msg);
     unsigned int row = this->screen.getRow();
     unsigned int column = this->screen.getColumn();
-    int option = this->screen.getInt();
+    int option = 0;
 
     while(true) {
+        option = this->screen.getInt();
         switch(option) {
             case 1:
             case 2:
@@ -175,20 +175,24 @@ Menu & Menu::addPlayer() {
                 return this->playersMenu();
                 break;
             default:
-                this->unknownOptionMsg(row);
-                option = this->screen.getInt();
+                this->errorMsgPrint(select_msg, unknown_option, row);
                 continue;
         }
 
         break;
     }
 
-    this->screen.clearScreen().print(L"Type the symbol for player: ");
+    const std::wstring msg = L"Type the symbol for player: ";
+    this->screen.clearScreen().print(msg);
     row = this->screen.getRow();
     column = this->screen.getColumn();
     
     do {
         std::wstring symbol = this->screen.getLine();
+        if (symbol.size() != 1) {
+            this->errorMsgPrint(msg, L"Number of characters for symbol needs to be 1", row);
+            continue;
+        }
         Player<std::wstring> * player = nullptr;
         try {
             if (option == 1) {
@@ -200,7 +204,7 @@ Menu & Menu::addPlayer() {
             this->players.emplace_back(player);
             break;
         } catch(UnusableSymbol & error) {
-            this->errorMsgPrint(UNUSABLE_SYMBOL_WMSG, row, column);
+            this->errorMsgPrint(msg, UNUSABLE_SYMBOL_WMSG, row);
             continue;
         }
     } while(true);
@@ -235,8 +239,7 @@ Menu & Menu::deletePlayer() {
         }
 
         if (option > this->players.size() || option == 0) {
-            this->screen.setPlace(row + 2, 0).clearLine().print(L"Player not found at ").print(option);
-            this->screen.setPlace(row, 0).clearLine().print(msg);
+            this->errorMsgPrint(msg, L"Player not found at " + std::to_wstring(option), row);
             continue;
         }
 
@@ -275,8 +278,7 @@ Menu & Menu::changePlayerSymbol() {
         }
 
         if (option > this->players.size() || option == 0) {
-            this->screen.setPlace(row + 2, 0).clearLine().print(L"Player not found at ").print(option);
-            this->screen.setPlace(row, 0).clearLine().print(msg);
+            this->errorMsgPrint(msg, L"Player not found at " + std::to_wstring(option), row);
             continue;
         }
 
@@ -287,15 +289,19 @@ Menu & Menu::changePlayerSymbol() {
     this->screen.clearScreen();
     this->screen.print(L"Actual player symbol: " + player.getPlayerSymbol() + L"\n");
     msg = L"New player symbol: ";
-    this->screen.print(L"New player symbol: ");
+    this->screen.print(msg);
     row = this->screen.getRow();
     do {
         std::wstring symbol = this->screen.getLine();
+        if (symbol.size() != 1) {
+            this->errorMsgPrint(msg, L"Number of characters for symbol needs to be 1", row);
+            continue;
+        }
+
         try {
             player.setPlayerSymbol(symbol);
         } catch(UnusableSymbol & _) {
-            this->screen.print(L"\n\n").clearLine().print(UNUSABLE_SYMBOL_WMSG);
-            this->screen.setPlace(row, 0).clearLine().print(msg);
+            this->errorMsgPrint(msg, UNUSABLE_SYMBOL_WMSG, row);
             continue;
         }
 
@@ -334,8 +340,7 @@ Menu & Menu::changePlayerOrder() {
         }
 
         if (option > this->players.size() || option == 0) {
-            this->screen.setPlace(row + 2, 0).clearLine().print(L"Player not found at ").print(option);
-            this->screen.setPlace(row, 0).clearLine().print(msg);
+            this->errorMsgPrint(msg, L"Player not found at " + std::to_wstring(option), row);
             continue;
         }
 
@@ -358,8 +363,7 @@ Menu & Menu::changePlayerOrder() {
         }
 
         if (option_2 > this->players.size() || option_2 == 0) {
-            this->screen.setPlace(row + 2, 0).clearLine().print(L"Player not found at ").print(option);
-            this->screen.setPlace(row, 0).clearLine().print(msg);
+            this->errorMsgPrint(msg, L"Player not found at " + std::to_wstring(option), row);
             continue;
         }
 
@@ -395,48 +399,14 @@ Menu & Menu::tableMenu() {
         option = this->screen.getInt();
 
         switch(option) {
-            case 1: {
-                    std::wstring msg = L"Type the number of rows and columns for the table: ";
-                    this->screen.clearScreen().print(msg);
-                    row = this->screen.getRow();
-                    int number_of_rows_col = 0;
-                    bool negative = false;
-                    do {
-                        number_of_rows_col = this->screen.getInt();
-                        if (number_of_rows_col <= 0) {
-                            this->screen.setPlace(row + 2, 0).clearLine().print(L"Table can't have 0 or less columns and rows");
-                            this->screen.setPlace(row, 0).clearLine().print(msg);
-                            negative = true;
-                        } else {
-                            negative = false;
-                        }
-                    } while(negative);
-
-                    if (this->table != nullptr) {
-                        StringTable * delete_pointer = &(*this->table);
-                        this->table = nullptr;
-                        delete delete_pointer;
-                    }
-
-                    this->table = new StringTable(number_of_rows_col, number_of_rows_col);
-                    this->screen.clearScreen().print(L"Number of rows and columns was set to ").print(this->table->getColumnsNum()).print(L" with success");
-                    this->screen.print(L"\nPress enter to go back to table menu\n").getLine();
-                    return this->tableMenu();
-                }
+            case 1: 
+                return this->setTableColumnAndRow();
             case 2:
-                if (this->table == nullptr) {
-                    this->screen.setPlace(row + 2, 0).clearLine().print(L"Table row and column wasn't set yet");
-                    this->screen.setPlace(row, 0).clearLine().print(select_msg);
-                    break;
-                }
-
-                this->screen.clearScreen().print(this->table->tableString());
-                this->screen.print(L"\n Press enter to go back to table menu\n").getLine();
-                return this->tableMenu();
+                return this->showTablePreview();
             case 3:
                 return this->customizationMenu();
             default:
-                this->unknownOptionMsg(row);
+                this->errorMsgPrint(select_msg, unknown_option, row);
                 continue;
         }
 
@@ -445,13 +415,6 @@ Menu & Menu::tableMenu() {
 
     return *this;
 }
-
-void Menu::unknownOptionMsg(const unsigned int & row) {
-    this->screen.setPlace(this->screen.getRow() + 2, 0).clearLine().print(L"Unknown option.");
-    this->screen.setPlace(row, 0).clearLine().print(select_msg);
-}
-
-
 
 void Menu::printPlayers() {
     if (this->players.empty()) {
@@ -473,7 +436,51 @@ void Menu::printOptions(std::array<std::wstring, t> & options) {
     this->screen.print(L"\n");
 }
 
-void Menu::errorMsgPrint(const std::wstring & msg, const unsigned & row, const unsigned & column) {
-    this->screen.print(L"\n\n").clearLine().print(msg);
-    this->screen.setPlace(row, column).clearColumnRange(column, this->screen.getColumn());
+void Menu::errorMsgPrint(const std::wstring & entry_msg, const std::wstring error_msg, const unsigned int & row) {
+    this->screen.setPlace(row + 3, 0).clearLine().print(error_msg);
+    this->screen.setPlace(row, 0).clearLine().print(entry_msg);
+}
+
+Menu & Menu::setTableColumnAndRow() {
+   std::wstring msg = L"Type the number of rows and columns for the table: ";
+    this->screen.clearScreen().print(msg);
+    int row = this->screen.getRow();
+    int number_of_rows_col = 0;
+    bool negative = false;
+    do {
+        number_of_rows_col = this->screen.getInt();
+        if (number_of_rows_col <= 0) {
+            this->errorMsgPrint(msg, L"Table can't have 0 or less columns and rows", row);
+            negative = true;
+        } else if (number_of_rows_col > 255){
+            this->errorMsgPrint(msg, L"Table can't have 256 or more columns and rows", row);
+            negative = true;
+        } else {
+            negative = false;
+        }
+    } while(negative);
+
+    if (this->table != nullptr) {
+        StringTable * delete_pointer = &(*this->table);
+        this->table = nullptr;
+        delete delete_pointer;
+    }
+
+    this->table = new StringTable(number_of_rows_col, number_of_rows_col);
+    this->screen.clearScreen().print(L"Number of rows and columns was set to ").print(this->table->getColumnsNum()).print(L" with success");
+    this->screen.print(L"\nPress enter to go back to table menu\n").getLine();
+    return this->tableMenu();
+}
+
+Menu & Menu::showTablePreview() {
+    if (this->table == nullptr) {
+        this->screen.setPlace(this->screen.getRow() + 1, 0).clearLine().print(L"Table row and column wasn't set yet");
+        this->screen.setPlace(this->screen.getRow() - 3, 0).clearLine().print(select_msg);
+
+        return this->tableMenu();
+    }
+
+    this->screen.clearScreen().print(this->table->tableString());
+    this->screen.print(L"\n Press enter to go back to table menu\n").getLine();
+    return this->tableMenu();
 }
