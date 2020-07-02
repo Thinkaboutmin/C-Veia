@@ -3,3 +3,9 @@ enum class MenuOption {
     CUSTOMIZED,
     TOTAL
 };
+
+enum class MenuFinishOption {
+    PLAY_AGAIN,
+    MODIFY_GAME,
+    EXIT
+};

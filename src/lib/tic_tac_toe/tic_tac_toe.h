@@ -210,6 +210,17 @@ namespace tic_tac_toe {
             delete table;
         }
 
+        TicTacToe<T> & resetGame() {
+            // No winner anymore.
+            this->winner = nullptr;
+            // Reset to the first player.
+            this->playerToPlay = 0;
+            // Regenerate the table with it's empty value;
+            this->table->clearValues();
+
+            return *this;
+        }
+
     private:
         // Pick a player which the symbol matches.
         Player<T> * checkSymbolForPlayer(T symbol) {

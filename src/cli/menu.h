@@ -42,6 +42,13 @@ public:
     * Return the table created by the user and delte it from the class.
     */
     StringTable * getTable();
+
+    /*
+    * Ask the user if it wants to play again.
+    */
+    MenuFinishOption playAgain();
+
+    Menu & clearScreenEndGame();
     
 private:
 

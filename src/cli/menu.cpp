@@ -484,3 +484,43 @@ Menu & Menu::showTablePreview() {
     this->screen.print(L"\n Press enter to go back to table menu\n").getLine();
     return this->tableMenu();
 }
+
+Menu & Menu::clearScreenEndGame() {
+    this->screen.print(L"\n\nPress enter to go to menu.");
+    this->screen.getLine();
+    return *this;
+}
+
+MenuFinishOption Menu::playAgain() {
+    this->screen.clearScreen();
+
+    std::array<std::wstring, 3> options {
+        L"Play again",
+        L"Modify options",
+        L"Exit"
+    };
+
+    this->printOptions(options);
+    this->screen.print(select_msg);
+    unsigned int row = this->screen.getRow();
+
+    do {
+        int option = this->screen.getInt();
+
+        switch(option) {
+            case 1:
+                return MenuFinishOption::PLAY_AGAIN;
+                break;
+            case 2:
+                return MenuFinishOption::MODIFY_GAME;
+                break;
+            case 3:
+                return MenuFinishOption::EXIT;
+                break;
+            default:
+                this->errorMsgPrint(select_msg, unknown_option, row);
+                continue;
+                break;
+        }
+    } while(true);
+}

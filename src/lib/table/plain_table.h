@@ -169,6 +169,12 @@ namespace tic_tac_toe {
             return *this;
         }
 
+        PlainTable<T> & clearValues() {
+            generateValueTable();
+
+            return *this;
+        }
+
     protected:
         /*
          * Generate the value table with default values.
