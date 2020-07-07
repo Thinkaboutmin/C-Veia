@@ -75,5 +75,7 @@ int main(int argc, char ** argv) {
         option = menu.clearScreenEndGame().playAgain();
     } while(option != MenuFinishOption::EXIT);
 
+    delete game;
+
     return 0;
 }
