@@ -4,18 +4,27 @@
 #include <string>
 #include <vector>
 #include <array>
+#include <map>
 
 #include "../lib/player/player.h"
 #include "menu_enum.h"
 #include "screen.h"
 #include "string_table.h"
+#include "player_type.h"
 
 
 using namespace tic_tac_toe;
 class Menu {
 private:
-    Screen & screen;
+    static PlayerType user;
+    static PlayerType ai;
+
     std::vector<Player<std::wstring> *> players;
+
+    std::vector<PlayerType *> playersType;
+
+    Screen & screen;
+
     StringTable * table = nullptr;
 
 public:

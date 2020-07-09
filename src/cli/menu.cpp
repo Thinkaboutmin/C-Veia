@@ -10,6 +10,9 @@
 const std::wstring select_msg {L"Please, select an option: "};
 const std::wstring unknown_option {L"Unknown option was given, choose a valid one"};
 
+PlayerType Menu::ai = PlayerType::AI;
+PlayerType Menu::user = PlayerType::USER;
+
 Menu::Menu(Screen & screen) : screen(screen) {}
 
 MenuOption Menu::askForMode() {
@@ -46,6 +49,7 @@ std::vector<Player<std::wstring> *> Menu::getPlayers() {
 
     auto tmp_players = this->players;
     this->players.clear();
+    this->playersType.clear();
     return tmp_players;
 }
 
@@ -197,8 +201,11 @@ Menu & Menu::addPlayer() {
         try {
             if (option == 1) {
                 player = new HumanPlayer(symbol, this->screen);
+                this->playersType.emplace_back(&user);
+
             } else {
                 player = new AI<std::wstring>(symbol);
+                this->playersType.emplace_back(&ai);
             }
 
             this->players.emplace_back(player);
@@ -245,6 +252,7 @@ Menu & Menu::deletePlayer() {
 
         delete this->players[option - 1];
         this->players.erase(this->players.begin() + (option - 1));
+        this->playersType.erase(this->playersType.begin() + (option - 1));
         this->screen.clearScreen();
         this->printPlayers();
         this->screen.print(L"Player deleted with success. Press enter to go back to player menu\n");
@@ -274,7 +282,7 @@ Menu & Menu::changePlayerSymbol() {
     do {
         option = this->screen.getInt();
         if (option == -1) {
-            break;
+            return this->playersMenu();
         }
 
         if (option > this->players.size() || option == 0) {
@@ -336,7 +344,7 @@ Menu & Menu::changePlayerOrder() {
     do {
         option = this->screen.getInt();
         if (option == -1) {
-            break;
+            return this->playersMenu();
         }
 
         if (option > this->players.size() || option == 0) {
@@ -363,7 +371,7 @@ Menu & Menu::changePlayerOrder() {
         }
 
         if (option_2 > this->players.size() || option_2 == 0) {
-            this->errorMsgPrint(msg, L"Player not found at " + std::to_wstring(option), row);
+            this->errorMsgPrint(msg, L"Player not found at " + std::to_wstring(option_2), row);
             continue;
         }
 
@@ -372,6 +380,7 @@ Menu & Menu::changePlayerOrder() {
 
     if (option_2 != option) {
         std::swap(this->players[option -1], this->players[option_2 - 1]);
+        std::swap(this->playersType[option -1], this->playersType[option_2 - 1]);
     }
 
     this->screen.clearScreen();
@@ -420,9 +429,10 @@ void Menu::printPlayers() {
     if (this->players.empty()) {
         this->screen.print(L"No players added yet.\n\n");
     } else {
-        this->screen.print(L"Players (order - symbol)\n");
+        this->screen.print(L"Players (order - symbol - type)\n");
         for (int i = 0; i < this->players.size(); ++i) {
-            this->screen.print(i + 1).print(L" - " + this->players[i]->getPlayerSymbol() + L"\n");
+            std::wstring playerType = *this->playersType[i] == ai ? L"AI" : L"User";
+            this->screen.print(i + 1).print(L" - " + this->players[i]->getPlayerSymbol() + L" - " + playerType + L"\n");
         }
         this->screen.print(L"\n");
     }
