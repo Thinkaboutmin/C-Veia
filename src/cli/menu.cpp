@@ -473,14 +473,16 @@ Menu & Menu::setTableColumnAndRow() {
 }
 
 Menu & Menu::showTablePreview() {
+    this->screen.clearScreen();
+
     if (this->table == nullptr) {
-        this->screen.setPlace(this->screen.getRow() + 1, 0).clearLine().print(L"Table row and column wasn't set yet");
-        this->screen.setPlace(this->screen.getRow() - 3, 0).clearLine().print(select_msg);
+        this->screen.print(L"Table row and column wasn't set yet");
+        this->screen.print(L"\n\nPress enter to go back to table menu\n").getLine();
 
         return this->tableMenu();
     }
 
-    this->screen.clearScreen().print(this->table->tableString());
+    this->screen.print(this->table->tableString());
     this->screen.print(L"\n Press enter to go back to table menu\n").getLine();
     return this->tableMenu();
 }
