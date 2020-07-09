@@ -233,7 +233,7 @@ Menu & Menu::deletePlayer() {
         this->screen.getLine();
         return this->playersMenu();
     } else {
-        this->screen.setPlace(this->screen.getRow() - 1, 0).print(L"-1 - go back to menu\n\n");
+        this->screen.setPlace(this->screen.getRow() - 1, 0).print(L"0 - go back to menu\n\n");
     }
 
     std::wstring msg = L"Select a player number (order) to delete: ";
@@ -241,11 +241,11 @@ Menu & Menu::deletePlayer() {
     unsigned int row = this->screen.getRow();
     do {
         int option = this->screen.getInt();
-        if (option == -1) {
+        if (option == 0) {
             break;
         }
 
-        if (option > this->players.size() || option == 0) {
+        if (option > this->players.size()) {
             this->errorMsgPrint(msg, L"Player not found at " + std::to_wstring(option), row);
             continue;
         }
@@ -272,7 +272,7 @@ Menu & Menu::changePlayerSymbol() {
         this->screen.getLine();
         return this->playersMenu();
     } else {
-        this->screen.setPlace(this->screen.getRow() - 1, 0).print(L"-1 - go back to menu\n\n");
+        this->screen.setPlace(this->screen.getRow() - 1, 0).print(L"0 - go back to menu\n\n");
     }
 
     std::wstring msg = L"Select a player number (order) to change symbol: ";
@@ -281,11 +281,11 @@ Menu & Menu::changePlayerSymbol() {
     int option = 0;
     do {
         option = this->screen.getInt();
-        if (option == -1) {
+        if (option == 0) {
             return this->playersMenu();
         }
 
-        if (option > this->players.size() || option == 0) {
+        if (option > this->players.size()) {
             this->errorMsgPrint(msg, L"Player not found at " + std::to_wstring(option), row);
             continue;
         }
@@ -334,7 +334,7 @@ Menu & Menu::changePlayerOrder() {
         this->screen.getLine();
         return this->playersMenu();
     } else {
-        this->screen.setPlace(this->screen.getRow() - 1, 0).print(L"-1 - go back to menu\n\n");
+        this->screen.setPlace(this->screen.getRow() - 1, 0).print(L"0 - go back to menu\n\n");
     }
 
     std::wstring msg = L"Select a player number (order) to change player order: ";
@@ -343,11 +343,11 @@ Menu & Menu::changePlayerOrder() {
     int option = 0;    
     do {
         option = this->screen.getInt();
-        if (option == -1) {
+        if (option == 0) {
             return this->playersMenu();
         }
 
-        if (option > this->players.size() || option == 0) {
+        if (option > this->players.size()) {
             this->errorMsgPrint(msg, L"Player not found at " + std::to_wstring(option), row);
             continue;
         }
