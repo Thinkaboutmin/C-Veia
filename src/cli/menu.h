@@ -16,12 +16,12 @@
 using namespace tic_tac_toe;
 class Menu {
 private:
-    static PlayerType user;
-    static PlayerType ai;
+    static constexpr PlayerType user = PlayerType::USER;
+    static constexpr PlayerType ai = PlayerType::AI;
 
     std::vector<Player<std::wstring> *> players;
 
-    std::vector<PlayerType *> playersType;
+    std::vector<const PlayerType *> playersType;
 
     Screen & screen;
 

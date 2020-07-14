@@ -10,9 +10,6 @@
 const std::wstring select_msg {L"Please, select an option: "};
 const std::wstring unknown_option {L"Unknown option was given, choose a valid one"};
 
-PlayerType Menu::ai = PlayerType::AI;
-PlayerType Menu::user = PlayerType::USER;
-
 Menu::Menu(Screen & screen) : screen(screen) {}
 
 MenuOption Menu::askForMode() {
