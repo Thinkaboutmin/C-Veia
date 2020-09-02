@@ -3,6 +3,7 @@
 
 #include <random>
 #include <chrono>
+#include <map>
 
 #include "player.h"
 #include "../exceptions/player/player_exceptions.h"
@@ -126,8 +127,13 @@ namespace tic_tac_toe {
         // A 100% calculated move. It will observe the table and
         // move to win accordingly.
         PlayerMove<T> hardMove(PlainTable<T> &table) {
-            // TODO: Develop an algorithm which plays thoughtfully.
-            // rowsAndColumns available_cells = Player<T>::getAvailableMoves();
+            // TODO: Develop an algorithm which plays thoughtfully. In progress
+            rowsAndColumns available_cells = Player<T>::getAvailableMoves();
+            std::map<const T *, rowsAndColumns> players_cells = table.getSymbolsCells();
+            rowsAndColumns my_cells = players_cells[&this->player_symbol];
+
+            // TODO: Check if any player is almost winning.
+            
 
             return PlayerMove<T>(0, 0, T());
         }
