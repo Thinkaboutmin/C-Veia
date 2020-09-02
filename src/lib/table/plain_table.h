@@ -216,7 +216,7 @@ namespace tic_tac_toe {
                     player_cells[map_symbol.first].emplace_back(std::vector<unsigned short>());
                 }
 
-                for (unsigned short column = 1; column <= this->table_values[row - 1]; ++column) {
+                for (unsigned short column = 1; column <= this->columns; ++column) {
                     const T * player_symbol = this->getCellValue(row, column);
                     if (*player_symbol != this->empty_value) {
                         // Although pointers can differ in address or its pointed address, this is
