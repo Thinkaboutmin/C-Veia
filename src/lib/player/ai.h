@@ -4,6 +4,7 @@
 #include <random>
 #include <chrono>
 #include <map>
+#include <utility>
 
 #include "player.h"
 #include "../exceptions/player/player_exceptions.h"
@@ -128,12 +129,70 @@ namespace tic_tac_toe {
         // move to win accordingly.
         PlayerMove<T> hardMove(PlainTable<T> &table) {
             // TODO: Develop an algorithm which plays thoughtfully. In progress
-            rowsAndColumns available_cells = Player<T>::getAvailableMoves();
+            rowsAndColumns available_cells = Player<T>::getAvailableMoves(table);
             std::map<const T *, rowsAndColumns> players_cells = table.getSymbolsCells();
-            rowsAndColumns my_cells = players_cells[&this->player_symbol];
+            rowsAndColumns my_cells = players_cells[&this->getPlayerSymbol()];
 
-            // TODO: Check if any player is almost winning.
+
+            const short & rows = table.getRowsNum();
+            const short & columns = table.getColumnsNum();
+            for (std::pair<const T *, rowsAndColumns> player_cell : players_cells) {
+                const unsigned int total_index = [&, rows](){
+                        // This lambda is used only to get the total number
+                        // of the sum of rows until it is 1.
+                        unsigned int total_index = 0;
+                        for (unsigned short row = 1; row <= rows; ++row) {
+                            total_index += row;
+                        }
+
+                        return total_index;
+                    }();
+                        
+                // Horizontal check
+                // Check if a player is almost winning by just one tile.
+                for (unsigned short row = 1; row <= rows; ++row) {
+                    if (player_cell.second[row-1].size() == rows - 1) {
+                        unsigned int filled = 0;
+                        
+                        for (const unsigned short column_position : player_cell.second[row - 1]) {
+                            filled += column_position;
+                        }
+                        const unsigned short column = total_index - filled;
+                        return PlayerMove<T>(row, column, this->getPlayerSymbol());
+                    }
+                }
+
+                // Vertical check.
+                std::vector<std::vector<unsigned short>> player_columns;
+                player_columns.resize(columns);
+
+                // Fill the columns
+                for (unsigned short row = 1; row <= rows; ++row) {
+                    for (unsigned short column = 1; column <= columns; ++column) {
+                        player_columns[column - 1].emplace_back(player_cell.second[row - 1][column - 1]);
+                    }
+                }
+
+                for (unsigned short column = 1; column <= columns; ++column) {
+                    const std::vector<unsigned short> & player_column = player_columns[column - 1];
+                    if (player_column.size() == columns - 1) {
+                        unsigned int filled = 0;
+                        
+                        for (const unsigned short column_position : player_column) {
+                            filled += column_position;
+                        }
+                        const unsigned short row = total_index - filled;
+                        return PlayerMove<T>(row, column, this->getPlayerSymbol());
+                    }
+                }
+                
+                // TODO:
+                // Forward slash check
+                
+                // Backward slash check
+            }
             
+
 
             return PlayerMove<T>(0, 0, T());
         }
