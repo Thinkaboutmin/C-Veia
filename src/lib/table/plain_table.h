@@ -5,9 +5,12 @@
 
 #include <vector>
 #include <limits>
+#include <map>
 
 namespace tic_tac_toe {
     using constUnShort = const unsigned short;
+    using rowsAndColumns = std::vector<std::vector<unsigned short>>;
+
 
     /*
     * A simple table object.
@@ -29,6 +32,9 @@ namespace tic_tac_toe {
     private:
         unsigned short rows = 0;
         unsigned short columns = 0;
+
+        // Total amount of symbols, aka, players on the table.
+        std::vector<const T *> symbols_on_table;
         T empty_value;
 
     protected:
@@ -115,6 +121,15 @@ namespace tic_tac_toe {
 
             this->table_values[row - 1][column - 1] = new_value;
 
+            if (*new_value != this->empty_value) {
+                for (const T * symbol : this->symbols_on_table) {
+                    if (*symbol != *new_value) {
+                        this->symbols_on_table.emplace_back(new_value);
+                        break;
+                    }
+                }
+            }
+
             return *this;
         }
 
@@ -169,10 +184,49 @@ namespace tic_tac_toe {
             return *this;
         }
 
+        /*
+         * Clear all values in the table by generating
+         * a new table.
+         */
         PlainTable<T> & clearValues() {
             generateValueTable();
 
             return *this;
+        }
+
+        /*
+         * Generate a map of all the player cells.
+         * 
+         * The value inside a key is a vector, which are rows and the vectors inside those rows
+         * are the columns position. 
+         *
+         * Note that even if the row doesn't have any
+         * value it will be on the row vector but without any column position.
+         */
+        const std::map<const T *, rowsAndColumns> getSymbolsCells() {
+            std::map<const T *, rowsAndColumns> player_cells;
+            // Prepare player cells.
+            for (const T * symbol : this->symbols_on_table) {
+                player_cells[symbol] = rowsAndColumns();
+            }
+            
+
+            for (unsigned short row = 1; row <= this->rows; ++rows) {
+                for (auto map_symbol : player_cells) {
+                    player_cells[map_symbol.first].emplace_back(std::vector<unsigned short>());
+                }
+
+                for (unsigned short column = 1; column <= this->table_values[row - 1]; ++column) {
+                    const T * player_symbol = this->getCellValue(row, column);
+                    if (*player_symbol != this->empty_value) {
+                        // Although pointers can differ in address or its pointed address, this is
+                        // not expected here at least, so it should work.
+                        player_cells[player_symbol][row - 1].emplace_back(column);
+                    }
+                }
+            }
+
+            return player_cells;
         }
 
     protected:
