@@ -4,6 +4,7 @@
 #include <limits>
 #include <list>
 #include <string>
+#include <map>
 
 #include "../table/plain_table.h"
 #include "player_move.h"
@@ -40,8 +41,8 @@ namespace tic_tac_toe {
         }
 
         /*
-        * Set the player symbol while veryfing if such
-        * is used. If used, UnsuableSymbol exception will be thrown.
+        * Set the player symbol while verifying if such
+        * is used. If used, UnusableSymbol exception will be thrown.
         */
         void setPlayerSymbol(T & symbol) {
             if (!verifyIfUsedSymbol(symbol)) {
