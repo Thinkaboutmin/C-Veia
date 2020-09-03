@@ -132,10 +132,17 @@ namespace tic_tac_toe {
             rowsAndColumns available_cells = Player<T>::getAvailableMoves(table);
             std::map<const T *, rowsAndColumns> players_cells = table.getSymbolsCells();
             rowsAndColumns my_cells = players_cells[&this->getPlayerSymbol()];
+            players_cells.erase(&this->getPlayerSymbol());
 
 
             const short & rows = table.getRowsNum();
             const short & columns = table.getColumnsNum();
+
+            // Resize this player cells if it is the first time
+            // playing.
+            if (my_cells.size() == 0) {
+                my_cells.resize(rows);
+            }
             for (std::pair<const T *, rowsAndColumns> player_cell : players_cells) {
                 const unsigned int total_index = [&, rows](){
                         // This lambda is used only to get the total number
@@ -151,7 +158,7 @@ namespace tic_tac_toe {
                 // Horizontal check
                 // Check if a player is almost winning by just one tile.
                 for (unsigned short row = 1; row <= rows; ++row) {
-                    if (player_cell.second[row-1].size() == rows - 1) {
+                    if (player_cell.second[row-1].size() == rows - 1 && my_cells[row -1].size() == 0) {
                         unsigned int filled = 0;
                         
                         for (const unsigned short column_position : player_cell.second[row - 1]) {
@@ -164,32 +171,52 @@ namespace tic_tac_toe {
 
                 // Vertical check.
                 std::vector<std::vector<unsigned short>> player_columns;
+                std::vector<std::vector<unsigned short>> my_columns;
                 player_columns.resize(columns);
+                my_columns.resize(columns);
 
                 // Fill the columns
                 for (unsigned short row = 1; row <= rows; ++row) {
-                    for (unsigned short column = 1; column <= columns; ++column) {
-                        player_columns[column - 1].emplace_back(player_cell.second[row - 1][column - 1]);
+                    if (player_cell.second[row - 1].size() != 0) {
+                        for (unsigned short column = 1; column <= columns; ++column) {
+                            for (const unsigned short column_verifier : player_cell.second[row - 1]) {
+                                if (column_verifier == column) {
+                                    player_columns[column - 1].emplace_back(row);
+                                }
+                            }
+                        }
+                    }
+                    if (my_cells[row - 1].size() != 0) {
+                        for (unsigned short column = 1; column <= columns; ++column) {
+                            for (const unsigned short column_verifier : my_cells[row - 1]) {
+                                if (column_verifier == column) {
+                                    my_columns[column - 1].emplace_back(row);
+                                }
+                            }
+                        }
                     }
                 }
 
                 for (unsigned short column = 1; column <= columns; ++column) {
                     const std::vector<unsigned short> & player_column = player_columns[column - 1];
-                    if (player_column.size() == columns - 1) {
+                    if (player_column.size() == columns - 1 && my_columns[column - 1].size() == 0) {
                         unsigned int filled = 0;
-                        
-                        for (const unsigned short column_position : player_column) {
-                            filled += column_position;
+                        for (const unsigned short row_position : player_column) {
+                            filled += row_position;
                         }
                         const unsigned short row = total_index - filled;
                         return PlayerMove<T>(row, column, this->getPlayerSymbol());
                     }
                 }
                 
-                // TODO:
+                
                 // Forward slash check
+                // FIXME: Not working as intended
                 rowsAndColumns player_forward_slash;
+                rowsAndColumns my_forward_slash;
                 player_forward_slash.resize(rows);
+                my_forward_slash.resize(rows);
+
                 unsigned short forward_slash_row;
                 for (unsigned short column = columns, row = 1; column != 0; --column, ++row) {
                     for (const unsigned short column_position : player_cell.second[row - 1]) {
@@ -198,9 +225,16 @@ namespace tic_tac_toe {
                             break;
                         }
                     }
+
+                    for (const unsigned short column_position : my_cells[row - 1]) {
+                        if (column_position == column) {
+                            my_forward_slash[row -1].emplace_back(column);
+                            break;
+                        }
+                    }
                 }
                 
-                if (player_forward_slash.size() == rows - 1) {
+                if (player_forward_slash.size() == rows - 1 && my_forward_slash.size() == 0) {
                     unsigned int filled = 0;
                     unsigned short row = 0;
                     unsigned int counter;
@@ -217,8 +251,11 @@ namespace tic_tac_toe {
                 }
                 
                 // Backward slash check
+                // FIXME: Not working as intended!
                 rowsAndColumns player_back_slash;
+                rowsAndColumns my_back_slash;
                 player_forward_slash.resize(rows);
+                my_back_slash.resize(rows);
                 unsigned short back_slash_row;
                 // Column and row will be the same on the backward slash check.
                 for (unsigned short column = 1; column <= columns; ++column) {
@@ -228,9 +265,16 @@ namespace tic_tac_toe {
                             break;
                         }
                     }
+
+                    for (const unsigned short column_position : my_cells[column - 1]) {
+                        if (column_position == column) {
+                            my_back_slash[column -1].emplace_back(column);
+                            break;
+                        }
+                    }
                 }
                 
-                if (player_back_slash.size() == rows - 1) {;
+                if (player_back_slash.size() == rows - 1 && my_back_slash.size() == 0) {;
                     unsigned short row = 0;
                     unsigned int counter;
                     for (std::vector<unsigned short> forward_slash_row : player_forward_slash) {
