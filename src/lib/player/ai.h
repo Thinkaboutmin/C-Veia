@@ -188,12 +188,62 @@ namespace tic_tac_toe {
                 
                 // TODO:
                 // Forward slash check
+                rowsAndColumns player_forward_slash;
+                player_forward_slash.resize(rows);
+                unsigned short forward_slash_row;
+                for (unsigned short column = columns, row = 1; column != 0; --column, ++row) {
+                    for (const unsigned short column_position : player_cell.second[row - 1]) {
+                        if (column_position == column) {
+                            player_forward_slash[row -1].emplace_back(column);
+                            break;
+                        }
+                    }
+                }
+                
+                if (player_forward_slash.size() == rows - 1) {
+                    unsigned int filled = 0;
+                    unsigned short row = 0;
+                    unsigned int counter;
+                    for (std::vector<unsigned short> forward_slash_row : player_forward_slash) {
+                        ++counter;
+                        if (forward_slash_row.size() != 0) {
+                            row = counter;
+                        } else {
+                            filled += forward_slash_row[0];
+                        }
+                    }
+                    unsigned short column = total_index - filled;
+                    return PlayerMove<T>(row, column, this->getPlayerSymbol());
+                }
                 
                 // Backward slash check
+                rowsAndColumns player_back_slash;
+                player_forward_slash.resize(rows);
+                unsigned short back_slash_row;
+                // Column and row will be the same on the backward slash check.
+                for (unsigned short column = 1; column <= columns; ++column) {
+                    for (const unsigned short column_position : player_cell.second[column - 1]) {
+                        if (column_position == column) {
+                            player_forward_slash[column -1].emplace_back(column);
+                            break;
+                        }
+                    }
+                }
+                
+                if (player_back_slash.size() == rows - 1) {;
+                    unsigned short row = 0;
+                    unsigned int counter;
+                    for (std::vector<unsigned short> forward_slash_row : player_forward_slash) {
+                        ++counter;
+                        if (forward_slash_row.size() != 0) {
+                            row = counter;
+                        }
+                    }
+                    return PlayerMove<T>(row, row, this->getPlayerSymbol());
+                }
             }
             
-
-
+            // TODO: Get the best move.
             return PlayerMove<T>(0, 0, T());
         }
     };
