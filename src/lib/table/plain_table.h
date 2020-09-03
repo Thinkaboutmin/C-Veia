@@ -122,11 +122,16 @@ namespace tic_tac_toe {
             this->table_values[row - 1][column - 1] = new_value;
 
             if (*new_value != this->empty_value) {
+                bool foundSymbol = false;
                 for (const T * symbol : this->symbols_on_table) {
-                    if (*symbol != *new_value) {
-                        this->symbols_on_table.emplace_back(new_value);
+                    if (*symbol == *new_value) {
+                        foundSymbol = true;
                         break;
                     }
+                }
+
+                if (!foundSymbol) {
+                    this->symbols_on_table.emplace_back(new_value);
                 }
             }
 
@@ -207,11 +212,11 @@ namespace tic_tac_toe {
             std::map<const T *, rowsAndColumns> player_cells;
             // Prepare player cells.
             for (const T * symbol : this->symbols_on_table) {
-                player_cells[symbol] = rowsAndColumns();
+                player_cells[symbol] = std::vector<std::vector<unsigned short>>();
             }
             
 
-            for (unsigned short row = 1; row <= this->rows; ++rows) {
+            for (unsigned short row = 1; row <= this->rows; ++row) {
                 for (auto map_symbol : player_cells) {
                     player_cells[map_symbol.first].emplace_back(std::vector<unsigned short>());
                 }
