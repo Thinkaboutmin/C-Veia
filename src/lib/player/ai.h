@@ -244,7 +244,7 @@ namespace tic_tac_toe {
             }
             
             // TODO: Get the best move.
-            return PlayerMove<T>(0, 0, T());
+            return this->easyMove(table);
         }
     };
 }
