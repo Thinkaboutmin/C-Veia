@@ -183,6 +183,28 @@ Menu & Menu::addPlayer() {
         break;
     }
 
+    this->screen.clearScreen();
+    difficulty dif;
+    if (option == 2) {
+        std::array<std::wstring, 3> difficulties {
+            L"Easy difficulty - Random moves",
+            L"Normal difficulty - 1/2 of doing random moves or thinking",
+            L"Hard difficulty - thoughtful moves"
+        };
+        Menu::printOptions<3>(difficulties);
+        this->screen.print(select_msg);
+
+        while (true) {
+            dif = static_cast<difficulty>(this->screen.getInt()) ;
+            
+            if (dif > difficulty::HARD || dif < difficulty::EASY) {
+                this->errorMsgPrint(select_msg, unknown_option, row);
+            } else {
+                break;
+            }
+        }
+    }
+
     const std::wstring msg = L"Type the symbol for player: ";
     this->screen.clearScreen().print(msg);
     row = this->screen.getRow();
@@ -201,7 +223,7 @@ Menu & Menu::addPlayer() {
                 this->playersType.emplace_back(&user);
 
             } else {
-                player = new AI<std::wstring>(symbol);
+                player = new AI<std::wstring>(symbol, dif);
                 this->playersType.emplace_back(&ai);
             }
 
