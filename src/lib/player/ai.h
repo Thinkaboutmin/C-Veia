@@ -211,79 +211,65 @@ namespace tic_tac_toe {
                 
                 
                 // Forward slash check
-                // FIXME: Not working as intended
-                rowsAndColumns player_forward_slash;
-                rowsAndColumns my_forward_slash;
-                player_forward_slash.resize(rows);
-                my_forward_slash.resize(rows);
+                // Pair representation: row, column
+                using row_column = std::pair<unsigned short, unsigned short>;
+                std::vector<row_column> player_forward_slash;
+                std::vector<row_column> my_forward_slash;
 
+                // Fill our forward slash vector with the actual values
+                // of the table.
                 unsigned short forward_slash_row;
                 for (unsigned short column = columns, row = 1; column != 0; --column, ++row) {
                     for (const unsigned short column_position : player_cell.second[row - 1]) {
                         if (column_position == column) {
-                            player_forward_slash[row -1].emplace_back(column);
+                            player_forward_slash.emplace_back(row, column);
                             break;
                         }
                     }
 
                     for (const unsigned short column_position : my_cells[row - 1]) {
                         if (column_position == column) {
-                            my_forward_slash[row -1].emplace_back(column);
+                            my_forward_slash.emplace_back(row, column);
                             break;
                         }
                     }
                 }
                 
                 if (player_forward_slash.size() == rows - 1 && my_forward_slash.size() == 0) {
-                    unsigned int filled = 0;
-                    unsigned short row = 0;
-                    unsigned int counter;
-                    for (std::vector<unsigned short> forward_slash_row : player_forward_slash) {
-                        ++counter;
-                        if (forward_slash_row.size() != 0) {
-                            row = counter;
-                        } else {
-                            filled += forward_slash_row[0];
-                        }
-                    }
-                    unsigned short column = total_index - filled;
+                    const unsigned short partial_row_index = player_forward_slash[0].first + player_forward_slash[1].first;
+                    const unsigned short partial_column_index = player_forward_slash[0].second + player_forward_slash[1].second;
+                    const unsigned short row = total_index - partial_row_index;
+                    const unsigned short column = total_index - partial_column_index;
                     return PlayerMove<T>(row, column, this->getPlayerSymbol());
                 }
                 
                 // Backward slash check
-                // FIXME: Not working as intended!
-                rowsAndColumns player_back_slash;
-                rowsAndColumns my_back_slash;
-                player_forward_slash.resize(rows);
-                my_back_slash.resize(rows);
+                std::vector<unsigned short> player_back_slash;
+                std::vector<unsigned short> my_back_slash;
+
                 unsigned short back_slash_row;
                 // Column and row will be the same on the backward slash check.
                 for (unsigned short column = 1; column <= columns; ++column) {
                     for (const unsigned short column_position : player_cell.second[column - 1]) {
                         if (column_position == column) {
-                            player_forward_slash[column -1].emplace_back(column);
+                            player_back_slash.emplace_back(column);
                             break;
                         }
                     }
 
                     for (const unsigned short column_position : my_cells[column - 1]) {
                         if (column_position == column) {
-                            my_back_slash[column -1].emplace_back(column);
+                            my_back_slash.emplace_back(column);
                             break;
                         }
                     }
                 }
                 
                 if (player_back_slash.size() == rows - 1 && my_back_slash.size() == 0) {;
-                    unsigned short row = 0;
+                    const unsigned short partial_row_column_index = player_back_slash[0] + player_back_slash[1];
+                    const unsigned short row_column = total_index - partial_row_column_index;
                     unsigned int counter;
-                    for (std::vector<unsigned short> forward_slash_row : player_forward_slash) {
-                        ++counter;
-                        if (forward_slash_row.size() != 0) {
-                            row = counter;
-                        }
-                    }
-                    return PlayerMove<T>(row, row, this->getPlayerSymbol());
+                    return PlayerMove<T>(row_column, row_column, this->getPlayerSymbol());
                 }
             }
             
