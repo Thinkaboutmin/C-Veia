@@ -122,7 +122,14 @@ namespace tic_tac_toe {
         // There's a 50% chance of it being random or calculated.
         // Basically a mixture of easyMove and hardMove.
         PlayerMove<T> normalMove(PlainTable<T> &table) {
-            // TODO: After hard mode, make the fifty-fifty.
+            // Prepare random number generation.
+            std::mt19937_64 generator(std::chrono::system_clock::now().time_since_epoch().count());
+            shortDistributor dist(0, 1);
+
+            if (dist(generator)) {
+                return this->hardMove(table);
+            }
+
             return this->easyMove(table);
         }
 
