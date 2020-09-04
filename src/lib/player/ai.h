@@ -144,8 +144,29 @@ namespace tic_tac_toe {
             }
 
             for (std::pair<const T *, rowsAndColumns> player_cell : players_cells) {
+                // Verify if only a single cell is missing to win.
+                PlayerMove<T> move = isWinCertainHorizontal(table, my_cells, total_index);
+                if (checkMove(move)) {
+                    return move;
+                }
+
+                move = isWinCertainVertical(table, my_cells, total_index);
+                if (checkMove(move)) {
+                    return move;
+                }
+
+                move = isWinCertainForwardSlash(table, my_cells, total_index);
+                if (checkMove(move)) {
+                    return move;
+                }
+
+                move = isWinCertainBackwardSlash(table, my_cells, total_index);
+                if (checkMove(move)) {
+                    return move;
+                }
+
                 // Verify if the player is almost winning and plays accordingly if noticed its near win.
-                PlayerMove<T> move = this->cancelWinHorizontal(table, player_cell, my_cells, total_index);
+                move = this->cancelWinHorizontal(table, player_cell, my_cells, total_index);
 
                 // If the move is valid it means that the player is almost winning
                 // hence we return a move with the local to stop it.
@@ -176,8 +197,168 @@ namespace tic_tac_toe {
             return this->easyMove(table);
         }
 
-        PlayerMove<T> isWinCertain(const rowsAndColumns & my_cells) {
-            // TODO
+        /*
+         * Check if there's only a single move to guarantee a win.
+         *
+         * This checks only the horizontal cells.
+         *
+         * table -> The table of the game.
+         * my_cells -> This class pieces, the same as the player cell
+         * total_index -> The sum of a horizontal or vertical cells position. It's used to
+         * get a cell whenever we have only one missing cell. 
+         * 
+         * Example: 3x3 table have the following position
+         * 
+         * Getting the total Index from a row of the table | 1 | 2 | 3 | 
+         * hence the total index is 1 + 2 + 3. If we have the postion 
+         * 1 and 3 we just have to add 1 + 3 and subtract from total_index
+         * to get 2.
+         */
+        PlayerMove<T> isWinCertainHorizontal(PlainTable<T> & table, const rowsAndColumns & my_cells, const unsigned int & total_index) {
+            const unsigned short & rows = table.getRowsNum();
+            const unsigned short & column = table.getColumnsNum();
+
+            for (unsigned short row = 1; row <= rows; ++row) {
+                const std::vector<unsigned short> & row_v = my_cells[row - 1];
+                if (row_v.size() == rows - 1) {
+                    unsigned int filled = 0;
+                    for (unsigned short column_postion : row_v ) {
+                        filled += column_postion;
+                    }
+
+                    unsigned short column = total_index - filled;
+
+                    return PlayerMove<T>(row, column, this->getPlayerSymbol());
+                }
+            }
+
+            return PlayerMove<T>(0, 0, this->getPlayerSymbol());
+        }
+
+        /*
+         * Check if there's only a single move to guarantee a win.
+         *
+         * This checks only the vertical cells.
+         *
+         * table -> The table of the game.
+         * my_cells -> This class pieces, the same as the player cell
+         * total_index -> The sum of a horizontal or vertical cells position. It's used to
+         * get a cell whenever we have only one missing cell. 
+         * 
+         * Example: 3x3 table have the following position
+         * 
+         * Getting the total Index from a row of the table | 1 | 2 | 3 | 
+         * hence the total index is 1 + 2 + 3. If we have the postion 
+         * 1 and 3 we just have to add 1 + 3 and subtract from total_index
+         * to get 2.
+         */
+        PlayerMove<T> isWinCertainVertical(PlainTable<T> & table, const rowsAndColumns & my_cells, const unsigned int & total_index) {
+            const unsigned short & rows = table.getRowsNum();
+            const unsigned short & columns = table.getColumnsNum();
+
+            for (unsigned short column = 1; column <= columns; ++column) {
+                unsigned short matches = 0;
+                unsigned int filled = 0;
+                for (unsigned short row = 1; row <= rows; ++row) {
+                    for (unsigned short column_position : my_cells[row - 1]) {
+                        if (column_position == column)  {
+                            ++matches;
+                            filled += row;
+                        }
+                    }
+                }
+
+                if (matches == columns - 1) {
+                    const unsigned short row = total_index - filled;
+                    return PlayerMove<T>(row, column, this->getPlayerSymbol());
+                }
+            }
+
+            return PlayerMove<T>(0, 0, this->getPlayerSymbol());
+        }
+
+        /*
+         * Check if there's only a single move to guarantee a win.
+         *
+         * This checks only the forward slash cells.
+         *
+         * table -> The table of the game.
+         * my_cells -> This class pieces, the same as the player cell
+         * total_index -> The sum of a horizontal or vertical cells position. It's used to
+         * get a cell whenever we have only one missing cell. 
+         * 
+         * Example: 3x3 table have the following position
+         * 
+         * Getting the total Index from a row of the table | 1 | 2 | 3 | 
+         * hence the total index is 1 + 2 + 3. If we have the postion 
+         * 1 and 3 we just have to add 1 + 3 and subtract from total_index
+         * to get 2.
+         */
+        PlayerMove<T> isWinCertainForwardSlash(PlainTable<T> & table, const rowsAndColumns & my_cells, const unsigned int & total_index) {
+            const unsigned short & rows = table.getRowsNum();
+            const unsigned short & columns = table.getColumnsNum();
+
+            for (unsigned short column = columns, row = 1; row <= rows; ++row, --column) {
+                unsigned short matches = 0;
+                unsigned int filled_row = 0;
+                unsigned int filled_column = 0;
+                for (unsigned short column_position : my_cells[row - 1]) {
+                    if (column_position == column) {
+                        ++matches;
+                        filled_row += row;
+                        filled_column += column;
+                    }
+                }
+
+                if (matches == rows) {
+                    unsigned short row = total_index - filled_row;
+                    // Overshadow the column variable, don't be confused with the other one
+                    unsigned short column = total_index - filled_column;
+
+                    return PlayerMove<T>(row, column, this->getPlayerSymbol());
+                }
+            }
+
+            return PlayerMove<T>(0, 0, this->getPlayerSymbol());
+        }
+
+        /*
+         * Check if there's only a single move to guarantee a win.
+         *
+         * This checks only the backwards slash cells.
+         *
+         * table -> The table of the game.
+         * my_cells -> This class pieces, the same as the player cell
+         * total_index -> The sum of a horizontal or vertical cells position. It's used to
+         * get a cell whenever we have only one missing cell. 
+         * 
+         * Example: 3x3 table have the following position
+         * 
+         * Getting the total Index from a row of the table | 1 | 2 | 3 | 
+         * hence the total index is 1 + 2 + 3. If we have the postion 
+         * 1 and 3 we just have to add 1 + 3 and subtract from total_index
+         * to get 2.
+         */
+        PlayerMove<T> isWinCertainBackwardSlash(PlainTable<T> & table, const rowsAndColumns & my_cells, const unsigned int & total_index) {
+            const unsigned short & rows = table.getRowsNum();
+            const unsigned short & columns = table.getColumnsNum();
+
+            for (unsigned short column = 1; column <= rows; ++column) {
+                unsigned short matches = 0;
+                unsigned int filled = 0;
+                for (unsigned short column_position : my_cells[column - 1]) {
+                    if (column_position == column) {
+                        ++matches;
+                        filled += column;
+                    }
+                }
+
+                if (matches == rows) {
+                    unsigned short row_column = total_index - filled;
+
+                    return PlayerMove<T>(row_column, row_column, this->getPlayerSymbol());
+                }
+            }
 
             return PlayerMove<T>(0, 0, this->getPlayerSymbol());
         }
