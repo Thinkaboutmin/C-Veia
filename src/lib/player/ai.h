@@ -402,6 +402,12 @@ namespace tic_tac_toe {
             return PlayerMove<T>(0, 0, this->getPlayerSymbol());
         }
 
+        /*
+         * Generate a total index value from a given number.
+         * 
+         * This generates a number which if looped until it becomes 1
+         * while doing sums of it's pasts values.
+         */
         const unsigned int generateTotalIndex(const unsigned short & row_column_value) const {
             const unsigned int total_index = [&, row_column_value](){
                 // This lambda is used only to get the total number
@@ -417,6 +423,13 @@ namespace tic_tac_toe {
             return total_index;
         }
 
+        /*
+         * Check if the move is valid.
+         *
+         * This checks only the if the column and row
+         * are not equal to 0, returning true if such is true.
+         * otherwise, false is given.
+         */
         bool checkMove(PlayerMove<T> move) {
             if (move.column != 0 && move.row != 0) {
                 return true;
