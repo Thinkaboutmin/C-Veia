@@ -152,7 +152,11 @@ namespace tic_tac_toe {
 
             for (std::pair<const T *, rowsAndColumns> player_cell : players_cells) {
                 // Verify if only a single cell is missing to win.
+                
                 PlayerMove<T> move = isWinCertainHorizontal(table, my_cells, total_index);
+
+                // If the move is valid it means that the player is almost winning
+                // hence we return a move with the local to stop it.
                 if (checkMove(move)) {
                     return move;
                 }
@@ -175,8 +179,6 @@ namespace tic_tac_toe {
                 // Verify if the player is almost winning and plays accordingly if noticed its near win.
                 move = this->cancelWinHorizontal(table, player_cell, my_cells, total_index);
 
-                // If the move is valid it means that the player is almost winning
-                // hence we return a move with the local to stop it.
                 if (checkMove(move)) {
                     return move;
                 }
@@ -524,8 +526,12 @@ namespace tic_tac_toe {
             }
             
             if (player_forward_slash.size() == rows - 1 && my_forward_slash.size() == 0) {
-                const unsigned short partial_row_index = player_forward_slash[0].first + player_forward_slash[1].first;
-                const unsigned short partial_column_index = player_forward_slash[0].second + player_forward_slash[1].second;
+                unsigned short partial_row_index = 0;
+                unsigned short partial_column_index = 0;
+                for (auto player_pair : player_forward_slash) {
+                    partial_row_index += player_pair.first;
+                    partial_column_index += player_pair.second;
+                }
                 const unsigned short row = total_index - partial_row_index;
                 const unsigned short column = total_index - partial_column_index;
                 return PlayerMove<T>(row, column, this->getPlayerSymbol());
@@ -580,9 +586,11 @@ namespace tic_tac_toe {
             }
             
             if (player_back_slash.size() == rows - 1 && my_back_slash.size() == 0) {;
-                const unsigned short partial_row_column_index = player_back_slash[0] + player_back_slash[1];
+                unsigned short partial_row_column_index = 0;
+                for (unsigned short row_position : player_back_slash) {
+                    partial_row_column_index += row_position;
+                }
                 const unsigned short row_column = total_index - partial_row_column_index;
-                unsigned int counter;
                 return PlayerMove<T>(row_column, row_column, this->getPlayerSymbol());
             }
 
