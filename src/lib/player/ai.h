@@ -5,6 +5,7 @@
 #include <chrono>
 #include <map>
 #include <utility>
+#include <functional>
 
 #include "player.h"
 #include "../exceptions/player/player_exceptions.h"
@@ -134,147 +135,294 @@ namespace tic_tac_toe {
             rowsAndColumns my_cells = players_cells[&this->getPlayerSymbol()];
             players_cells.erase(&this->getPlayerSymbol());
 
-
-            const short & rows = table.getRowsNum();
-            const short & columns = table.getColumnsNum();
+            const unsigned int total_index = generateTotalIndex(table.getRowsNum());
 
             // Resize this player cells if it is the first time
             // playing.
             if (my_cells.size() == 0) {
-                my_cells.resize(rows);
+                my_cells.resize(table.getRowsNum());
             }
+
             for (std::pair<const T *, rowsAndColumns> player_cell : players_cells) {
-                const unsigned int total_index = [&, rows](){
-                        // This lambda is used only to get the total number
-                        // of the sum of rows until it is 1.
-                        unsigned int total_index = 0;
-                        for (unsigned short row = 1; row <= rows; ++row) {
-                            total_index += row;
-                        }
+                // Verify if the player is almost winning and plays accordingly if noticed its near win.
+                PlayerMove<T> move = this->cancelWinHorizontal(table, player_cell, my_cells, total_index);
 
-                        return total_index;
-                    }();
-                        
-                // Horizontal check
-                // Check if a player is almost winning by just one tile.
-                for (unsigned short row = 1; row <= rows; ++row) {
-                    if (player_cell.second[row-1].size() == rows - 1 && my_cells[row -1].size() == 0) {
-                        unsigned int filled = 0;
-                        
-                        for (const unsigned short column_position : player_cell.second[row - 1]) {
-                            filled += column_position;
-                        }
-                        const unsigned short column = total_index - filled;
-                        return PlayerMove<T>(row, column, this->getPlayerSymbol());
-                    }
+                // If the move is valid it means that the player is almost winning
+                // hence we return a move with the local to stop it.
+                if (checkMove(move)) {
+                    return move;
                 }
 
-                // Vertical check.
-                std::vector<std::vector<unsigned short>> player_columns;
-                std::vector<std::vector<unsigned short>> my_columns;
-                player_columns.resize(columns);
-                my_columns.resize(columns);
+                move = this->cancelWinVertical(table, player_cell, my_cells, total_index);
 
-                // Fill the columns
-                for (unsigned short row = 1; row <= rows; ++row) {
-                    if (player_cell.second[row - 1].size() != 0) {
-                        for (unsigned short column = 1; column <= columns; ++column) {
-                            for (const unsigned short column_verifier : player_cell.second[row - 1]) {
-                                if (column_verifier == column) {
-                                    player_columns[column - 1].emplace_back(row);
-                                }
-                            }
-                        }
-                    }
-                    if (my_cells[row - 1].size() != 0) {
-                        for (unsigned short column = 1; column <= columns; ++column) {
-                            for (const unsigned short column_verifier : my_cells[row - 1]) {
-                                if (column_verifier == column) {
-                                    my_columns[column - 1].emplace_back(row);
-                                }
-                            }
-                        }
-                    }
+                if (checkMove(move)) {
+                    return move;
                 }
 
-                for (unsigned short column = 1; column <= columns; ++column) {
-                    const std::vector<unsigned short> & player_column = player_columns[column - 1];
-                    if (player_column.size() == columns - 1 && my_columns[column - 1].size() == 0) {
-                        unsigned int filled = 0;
-                        for (const unsigned short row_position : player_column) {
-                            filled += row_position;
-                        }
-                        const unsigned short row = total_index - filled;
-                        return PlayerMove<T>(row, column, this->getPlayerSymbol());
-                    }
-                }
-                
-                
-                // Forward slash check
-                // Pair representation: row, column
-                using row_column = std::pair<unsigned short, unsigned short>;
-                std::vector<row_column> player_forward_slash;
-                std::vector<row_column> my_forward_slash;
+                move = this->cancelWinForwardSlash(table, player_cell, my_cells, total_index);
 
-                // Fill our forward slash vector with the actual values
-                // of the table.
-                unsigned short forward_slash_row;
-                for (unsigned short column = columns, row = 1; column != 0; --column, ++row) {
-                    for (const unsigned short column_position : player_cell.second[row - 1]) {
-                        if (column_position == column) {
-                            player_forward_slash.emplace_back(row, column);
-                            break;
-                        }
-                    }
-
-                    for (const unsigned short column_position : my_cells[row - 1]) {
-                        if (column_position == column) {
-                            my_forward_slash.emplace_back(row, column);
-                            break;
-                        }
-                    }
+                if (checkMove(move)) {
+                    return move;
                 }
-                
-                if (player_forward_slash.size() == rows - 1 && my_forward_slash.size() == 0) {
-                    const unsigned short partial_row_index = player_forward_slash[0].first + player_forward_slash[1].first;
-                    const unsigned short partial_column_index = player_forward_slash[0].second + player_forward_slash[1].second;
-                    const unsigned short row = total_index - partial_row_index;
-                    const unsigned short column = total_index - partial_column_index;
-                    return PlayerMove<T>(row, column, this->getPlayerSymbol());
-                }
-                
-                // Backward slash check
-                std::vector<unsigned short> player_back_slash;
-                std::vector<unsigned short> my_back_slash;
 
-                unsigned short back_slash_row;
-                // Column and row will be the same on the backward slash check.
-                for (unsigned short column = 1; column <= columns; ++column) {
-                    for (const unsigned short column_position : player_cell.second[column - 1]) {
-                        if (column_position == column) {
-                            player_back_slash.emplace_back(column);
-                            break;
-                        }
-                    }
+                move = this->cancelWinBackwardSlash(table, player_cell, my_cells, total_index);
 
-                    for (const unsigned short column_position : my_cells[column - 1]) {
-                        if (column_position == column) {
-                            my_back_slash.emplace_back(column);
-                            break;
-                        }
-                    }
-                }
-                
-                if (player_back_slash.size() == rows - 1 && my_back_slash.size() == 0) {;
-                    const unsigned short partial_row_column_index = player_back_slash[0] + player_back_slash[1];
-                    const unsigned short row_column = total_index - partial_row_column_index;
-                    unsigned int counter;
-                    return PlayerMove<T>(row_column, row_column, this->getPlayerSymbol());
+                if (checkMove(move)) {
+                    return move;
                 }
             }
             
             // TODO: Get the best move.
             return this->easyMove(table);
+        }
+
+        PlayerMove<T> isWinCertain(const rowsAndColumns & my_cells) {
+            // TODO
+
+            return PlayerMove<T>(0, 0, this->getPlayerSymbol());
+        }
+
+        /*
+         * Check if a player is winning in a horizontal line.
+         * If it's not winning we return a PlayerMove<T> without any
+         * column and row. Otherwise a fullfiled PlayerMove<T> is given.
+         * 
+         * table -> The table of the game.
+         * player_cell -> It contains it's symbol and the position of such on the table.
+         * my_cells -> This class pieces, the same as the player cell
+         * total_index -> The sum of a horizontal or vertical cells position. It's used to
+         * get a cell whenever we have only one missing cell. 
+         * 
+         * Example: 3x3 table have the following position
+         * 
+         * Getting the total Index from a row of the table | 1 | 2 | 3 | 
+         * hence the total index is 1 + 2 + 3. If we have the postion 
+         * 1 and 3 we just have to add 1 + 3 and subtract from total_index
+         * to get 2.
+         */
+        PlayerMove<T> cancelWinHorizontal(PlainTable<T> & table, const std::pair<const T *, rowsAndColumns> & player_cell, 
+                                          const rowsAndColumns & my_cells, const unsigned int & total_index) {
+            const unsigned short & rows = table.getRowsNum();
+            const unsigned short & columns = table.getColumnsNum();
+
+            for (unsigned short row = 1; row <= rows; ++row) {
+                if (player_cell.second[row-1].size() == rows - 1 && my_cells[row -1].size() == 0) {
+                    unsigned int filled = 0;
+                    
+                    for (const unsigned short column_position : player_cell.second[row - 1]) {
+                        filled += column_position;
+                    }
+                    const unsigned short column = total_index - filled;
+                    return PlayerMove<T>(row, column, this->getPlayerSymbol());
+                }
+            }
+
+            // Return an impossible move meaning that there's no win to cancel.
+            return PlayerMove<T>(0, 0, this->getPlayerSymbol());
+        }   
+
+        /*
+         * Check if a player is winning in a vertical line.
+         * If it's not winning we return a PlayerMove<T> without any
+         * column and row. Otherwise a fullfiled PlayerMove<T> is given.
+         * 
+         * table -> The table of the game.
+         * player_cell -> It contains it's symbol and the position of such on the table.
+         * my_cells -> This class pieces, the same as the player cell
+         * total_index -> The sum of a horizontal or vertical cells position. It's used to
+         * get a cell whenever we have only one missing cell. 
+         * 
+         * Example: 3x3 table have the following position
+         * 
+         * Getting the total Index from a row of the table | 1 | 2 | 3 | 
+         * hence the total index is 1 + 2 + 3. If we have the postion 
+         * 1 and 3 we just have to add 1 + 3 and subtract from total_index
+         * to get 2.
+         */
+        PlayerMove<T> cancelWinVertical(PlainTable<T> & table, const std::pair<const T *, rowsAndColumns> & player_cell, 
+                                        const rowsAndColumns & my_cells, const unsigned int & total_index) {
+            const unsigned short & rows = table.getRowsNum();
+            const unsigned short & columns = table.getColumnsNum();
+
+            // Vertical check.
+            std::vector<std::vector<unsigned short>> player_columns;
+            std::vector<std::vector<unsigned short>> my_columns;
+            player_columns.resize(columns);
+            my_columns.resize(columns);
+
+            // Fill the columns
+            for (unsigned short row = 1; row <= rows; ++row) {
+                if (player_cell.second[row - 1].size() != 0) {
+                    for (unsigned short column = 1; column <= columns; ++column) {
+                        for (const unsigned short column_verifier : player_cell.second[row - 1]) {
+                            if (column_verifier == column) {
+                                player_columns[column - 1].emplace_back(row);
+                            }
+                        }
+                    }
+                }
+                if (my_cells[row - 1].size() != 0) {
+                    for (unsigned short column = 1; column <= columns; ++column) {
+                        for (const unsigned short column_verifier : my_cells[row - 1]) {
+                            if (column_verifier == column) {
+                                my_columns[column - 1].emplace_back(row);
+                            }
+                        }
+                    }
+                }
+            }
+
+            for (unsigned short column = 1; column <= columns; ++column) {
+                const std::vector<unsigned short> & player_column = player_columns[column - 1];
+                if (player_column.size() == columns - 1 && my_columns[column - 1].size() == 0) {
+                    unsigned int filled = 0;
+                    for (const unsigned short row_position : player_column) {
+                        filled += row_position;
+                    }
+                    const unsigned short row = total_index - filled;
+                    return PlayerMove<T>(row, column, this->getPlayerSymbol());
+                }
+            }
+
+            // Return an impossible move meaning that there's no win to cancel.
+            return PlayerMove<T>(0, 0, this->getPlayerSymbol());
+        }
+
+        /*
+         * Check if a player is winning in a vertical line.
+         * If it's not winning we return a PlayerMove<T> without any
+         * column and row. Otherwise a fullfiled PlayerMove<T> is given.
+         * 
+         * table -> The table of the game.
+         * player_cell -> It contains it's symbol and the position of such on the table.
+         * my_cells -> This class pieces, the same as the player cell
+         * total_index -> The sum of a horizontal or vertical cells position. It's used to
+         * get a cell whenever we have only one missing cell. 
+         * 
+         * Example: 3x3 table have the following position
+         * 
+         * Getting the total Index from a row of the table | 1 | 2 | 3 | 
+         * hence the total index is 1 + 2 + 3. If we have the postion 
+         * 1 and 3 we just have to add 1 + 3 and subtract from total_index
+         * to get 2.
+         */
+        PlayerMove<T> cancelWinForwardSlash(PlainTable<T> & table, const std::pair<const T *, rowsAndColumns> & player_cell, 
+                                            const rowsAndColumns & my_cells, const unsigned int & total_index) {
+            const unsigned short & rows = table.getRowsNum();
+            const unsigned short & columns = table.getColumnsNum();
+
+            // Pair representation: row, column
+            using row_column = std::pair<unsigned short, unsigned short>;
+            std::vector<row_column> player_forward_slash;
+            std::vector<row_column> my_forward_slash;
+
+            // Fill our forward slash vector with the actual values
+            // of the table.
+            unsigned short forward_slash_row;
+            for (unsigned short column = columns, row = 1; column != 0; --column, ++row) {
+                for (const unsigned short column_position : player_cell.second[row - 1]) {
+                    if (column_position == column) {
+                        player_forward_slash.emplace_back(row, column);
+                        break;
+                    }
+                }
+
+                for (const unsigned short column_position : my_cells[row - 1]) {
+                    if (column_position == column) {
+                        my_forward_slash.emplace_back(row, column);
+                        break;
+                    }
+                }
+            }
+            
+            if (player_forward_slash.size() == rows - 1 && my_forward_slash.size() == 0) {
+                const unsigned short partial_row_index = player_forward_slash[0].first + player_forward_slash[1].first;
+                const unsigned short partial_column_index = player_forward_slash[0].second + player_forward_slash[1].second;
+                const unsigned short row = total_index - partial_row_index;
+                const unsigned short column = total_index - partial_column_index;
+                return PlayerMove<T>(row, column, this->getPlayerSymbol());
+            }
+
+            // Return an impossible move meaning that there's no win to cancel.
+            return PlayerMove<T>(0, 0, this->getPlayerSymbol());
+        }
+
+        /*
+         * Check if a player is winning in a vertical line.
+         * If it's not winning we return a PlayerMove<T> without any
+         * column and row. Otherwise a fullfiled PlayerMove<T> is given.
+         * 
+         * table -> The table of the game.
+         * player_cell -> It contains it's symbol and the position of such on the table.
+         * my_cells -> This class pieces, the same as the player cell
+         * total_index -> The sum of a horizontal or vertical cells position. It's used to
+         * get a cell whenever we have only one missing cell. 
+         * 
+         * Example: 3x3 table have the following position
+         * 
+         * Getting the total Index from a row of the table | 1 | 2 | 3 | 
+         * hence the total index is 1 + 2 + 3. If we have the postion 
+         * 1 and 3 we just have to add 1 + 3 and subtract from total_index
+         * to get 2.
+         */
+        PlayerMove<T> cancelWinBackwardSlash(PlainTable<T> & table, const std::pair<const T *, rowsAndColumns> & player_cell, 
+                                             const rowsAndColumns & my_cells, const unsigned int & total_index) {
+            const unsigned short & rows = table.getRowsNum();
+            const unsigned short & columns = table.getColumnsNum();
+
+            std::vector<unsigned short> player_back_slash;
+            std::vector<unsigned short> my_back_slash;
+
+            unsigned short back_slash_row;
+            // Column and row will be the same on the backward slash check.
+            for (unsigned short column = 1; column <= columns; ++column) {
+                for (const unsigned short column_position : player_cell.second[column - 1]) {
+                    if (column_position == column) {
+                        player_back_slash.emplace_back(column);
+                        break;
+                    }
+                }
+
+                for (const unsigned short column_position : my_cells[column - 1]) {
+                    if (column_position == column) {
+                        my_back_slash.emplace_back(column);
+                        break;
+                    }
+                }
+            }
+            
+            if (player_back_slash.size() == rows - 1 && my_back_slash.size() == 0) {;
+                const unsigned short partial_row_column_index = player_back_slash[0] + player_back_slash[1];
+                const unsigned short row_column = total_index - partial_row_column_index;
+                unsigned int counter;
+                return PlayerMove<T>(row_column, row_column, this->getPlayerSymbol());
+            }
+
+            // Return an impossible move meaning that there's no win to cancel.
+            return PlayerMove<T>(0, 0, this->getPlayerSymbol());
+        }
+
+        const unsigned int generateTotalIndex(const unsigned short & row_column_value) const {
+            const unsigned int total_index = [&, row_column_value](){
+                // This lambda is used only to get the total number
+                // of the sum of rows until it is 1.
+                unsigned int total_index = 0;
+                for (unsigned short row = 1; row <= row_column_value; ++row) {
+                    total_index += row;
+                }
+
+                return total_index;
+            }();
+            
+            return total_index;
+        }
+
+        bool checkMove(PlayerMove<T> move) {
+            if (move.column != 0 && move.row != 0) {
+                return true;
+            }
+
+            return false;
         }
     };
 }
