@@ -9,7 +9,7 @@ HumanPlayer::HumanPlayer(std::wstring symbol, Screen & screen) : Player(symbol),
 PlayerMove<std::wstring> HumanPlayer::getMove(PlainTable<std::wstring> &table) {
     this->screen.print(L"\n\n");
 
- 	std::vector<std::vector<unsigned short>> available_moves = Player<std::wstring>::getAvailableMoves(table);
+ 	std::vector<std::vector<unsigned short>> available_moves = table.getEmptyCells();
     PlayerMove<std::wstring> player_move;
     do {
         if (player_move.failure) {

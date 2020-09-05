@@ -82,7 +82,7 @@ namespace tic_tac_toe {
         // Does not care about the table state. It will be
         // consistently of random moves.
         PlayerMove<T> easyMove(PlainTable<T> &table) {
-            rowsAndColumns available_cells = Player<T>::getAvailableMoves(table);
+            rowsAndColumns available_cells = table.getEmptyCells();
             // As we erase cells we will need to have a ordered list
             // which holds data about the available rows index.
             std::vector<unsigned short> available_rows;
@@ -137,7 +137,7 @@ namespace tic_tac_toe {
         // move to win accordingly.
         PlayerMove<T> hardMove(PlainTable<T> &table) {
             // TODO: Develop an algorithm which plays thoughtfully. In progress
-            rowsAndColumns available_cells = Player<T>::getAvailableMoves(table);
+            rowsAndColumns available_cells = table.getEmptyCells();
             std::map<const T *, rowsAndColumns> players_cells = table.getSymbolsCells();
             rowsAndColumns my_cells = players_cells[&this->getPlayerSymbol()];
             players_cells.erase(&this->getPlayerSymbol());
@@ -200,6 +200,13 @@ namespace tic_tac_toe {
                 if (checkMove(move)) {
                     return move;
                 }
+
+                
+            }
+
+            PlayerMove<T> move = multiMoveStrategy(table, my_cells, total_index);
+            if (checkMove(move)) {
+                return move;
             }
             
             // TODO: Get the best move.
@@ -237,7 +244,9 @@ namespace tic_tac_toe {
 
                     unsigned short column = total_index - filled;
 
-                    return PlayerMove<T>(row, column, this->getPlayerSymbol());
+                    if (*table.getCellValue(row, column) == table.getEmptyValue()) {
+                        return PlayerMove<T>(row, column, this->getPlayerSymbol());
+                    }
                 }
             }
 
@@ -279,7 +288,9 @@ namespace tic_tac_toe {
 
                 if (matches == columns - 1) {
                     const unsigned short row = total_index - filled;
-                    return PlayerMove<T>(row, column, this->getPlayerSymbol());
+                    if (*table.getCellValue(row, column) == table.getEmptyValue()) {
+                        return PlayerMove<T>(row, column, this->getPlayerSymbol());
+                    }
                 }
             }
 
@@ -323,8 +334,9 @@ namespace tic_tac_toe {
                     unsigned short row = total_index - filled_row;
                     // Overshadow the column variable, don't be confused with the other one
                     unsigned short column = total_index - filled_column;
-
-                    return PlayerMove<T>(row, column, this->getPlayerSymbol());
+                    if (*table.getCellValue(row, column) == table.getEmptyValue()) {
+                        return PlayerMove<T>(row, column, this->getPlayerSymbol());
+                    }
                 }
             }
 
@@ -364,8 +376,9 @@ namespace tic_tac_toe {
 
                 if (matches == rows) {
                     unsigned short row_column = total_index - filled;
-
-                    return PlayerMove<T>(row_column, row_column, this->getPlayerSymbol());
+                    if (*table.getCellValue(row_column, row_column) == table.getEmptyValue()) {
+                        return PlayerMove<T>(row_column, row_column, this->getPlayerSymbol());
+                    }
                 }
             }
 
@@ -595,6 +608,126 @@ namespace tic_tac_toe {
             }
 
             // Return an impossible move meaning that there's no win to cancel.
+            return PlayerMove<T>(0, 0, this->getPlayerSymbol());
+        }
+
+        PlayerMove<T> multiMoveStrategy(PlainTable<T> & table, const rowsAndColumns & my_cells, const unsigned int & total_index) {
+            const unsigned short & rows = table.getRowsNum();
+            const unsigned short & columns = table.getColumnsNum();
+
+            bool left_column_free = false;
+            bool right_column_free = false;
+            bool up_row_free = false;
+            bool down_row_free = false;
+
+            rowsAndColumns free_moves = table.getEmptyCells();
+
+            up_row_free = free_moves[0].size() + my_cells[0].size() == rows;
+            down_row_free = free_moves[rows - 1].size() + my_cells[rows - 1].size() == rows;
+            rowsAndColumns free_moves_columns = PlainTable<T>::convertRowsColumnsToColumnsRows(free_moves);
+            rowsAndColumns my_cells_columns = PlainTable<T>::convertRowsColumnsToColumnsRows(my_cells);
+            right_column_free = free_moves_columns[0].size() + my_cells_columns[0].size() == columns;
+            left_column_free = free_moves_columns[rows - 1].size() + my_cells_columns[rows - 1].size() == columns;
+            
+            if (up_row_free && right_column_free) {                
+                if (*table.getCellValue(1, columns) == table.getEmptyValue()) {
+                    return PlayerMove<T>(1, columns, this->getPlayerSymbol());
+                } else if (*table.getCellValue(rows, 1) == table.getEmptyValue()) {
+                    return PlayerMove<T>(rows, 1, this->getPlayerSymbol());
+                }
+
+
+                if (my_cells[0].size() == columns - 2 && my_cells_columns[0].size() == rows - 2) {
+                    return PlayerMove<T>(1, 1, this->getPlayerSymbol());
+                }
+                
+                if (my_cells[0].size() <= my_cells_columns[0].size())  {
+                    for (unsigned short column = columns; column != 0; --column) {
+                        if (*table.getCellValue(1, column) == table.getEmptyValue()) {
+                            return PlayerMove<T>(1, column, this->getPlayerSymbol());
+                        }
+                    }
+                } else if (my_cells_columns[0].size() > my_cells[0].size()) {
+                    for(unsigned short row = rows; row != 0; --row) {
+                        if (*table.getCellValue(row, 1) == table.getEmptyValue()) {
+                            return PlayerMove<T>(row, 1, this->getPlayerSymbol());
+                        }
+                    }
+                }
+            } else if (up_row_free && left_column_free) {
+                if (*table.getCellValue(1, 1) == table.getEmptyValue()) {
+                    return PlayerMove<T>(1, 1, this->getPlayerSymbol());
+                } else if (*table.getCellValue(rows, columns) == table.getEmptyValue()) {
+                    return PlayerMove<T>(rows, columns, this->getPlayerSymbol());
+                }
+
+                if (my_cells[0].size() == columns - 2 && my_cells_columns[rows - 1].size() == rows - 2) {
+                    return PlayerMove<T>(1, columns, this->getPlayerSymbol());
+                }
+                
+                if (my_cells[0].size() <= my_cells_columns[rows - 1].size())  {
+                    for (unsigned short column = 1; column <= columns; ++column) {
+                        if (*table.getCellValue(1, column) == table.getEmptyValue()) {
+                            return PlayerMove<T>(1, column, this->getPlayerSymbol());
+                        }
+                    }
+                } else if (my_cells_columns[rows - 1].size() > my_cells[0].size()) {
+                    for(unsigned short row = rows; row != 0; --row) {
+                        if (*table.getCellValue(row, columns) == table.getEmptyValue()) {
+                            return PlayerMove<T>(row, columns, this->getPlayerSymbol());
+                        }
+                    }
+                } 
+            } else if (down_row_free && right_column_free) {
+                if (*table.getCellValue(rows, columns) == table.getEmptyValue()) {
+                    return PlayerMove<T>(rows, columns, this->getPlayerSymbol());
+                } else if (*table.getCellValue(1, 1) == table.getEmptyValue()) {
+                    return PlayerMove<T>(1, 1, this->getPlayerSymbol());
+                }
+
+                if (my_cells[rows - 1].size() == columns - 2 && my_cells_columns[0].size() == rows - 2) {
+                    return PlayerMove<T>(rows, 1, this->getPlayerSymbol());
+                }
+                
+                if (my_cells[rows - 1].size() <= my_cells_columns[0].size())  {
+                    for (unsigned short column = columns; column != 0; --column) {
+                        if (*table.getCellValue(rows, column) == table.getEmptyValue()) {
+                            return PlayerMove<T>(rows, column, this->getPlayerSymbol());
+                        }
+                    }
+                } else if (my_cells_columns[0].size() > my_cells[rows - 1].size()) {
+                    for(unsigned short row = 1; row <= rows; ++row) {
+                        if (*table.getCellValue(row, 1) == table.getEmptyValue()) {
+                            return PlayerMove<T>(row, 1, this->getPlayerSymbol());
+                        }
+                    }
+                }
+            } else if (down_row_free && left_column_free) {
+                if (*table.getCellValue(rows, 1) == table.getEmptyValue()) {
+                    return PlayerMove<T>(rows, 1, this->getPlayerSymbol());
+                } else if (*table.getCellValue(1, columns) == table.getEmptyValue()) {
+                    return PlayerMove<T>(1, columns, this->getPlayerSymbol());
+                }
+
+                if (my_cells[0].size() == columns - 2 && my_cells_columns[rows - 1].size() == rows - 2) {
+                    return PlayerMove<T>(rows, columns, this->getPlayerSymbol());
+                }
+                
+                if (my_cells[columns - 1].size() <= my_cells_columns[rows - 1].size())  {
+                    for (unsigned short column = 1; column <= columns; ++column) {
+                        if (*table.getCellValue(rows, column) == table.getEmptyValue()) {
+                            return PlayerMove<T>(rows, column, this->getPlayerSymbol());
+                        }
+                    }
+                } else if (my_cells_columns[rows - 1].size() > my_cells[columns - 1].size()) {
+                    for(unsigned short row = 1; row <= rows; ++row) {
+                        if (*table.getCellValue(row, columns) == table.getEmptyValue()) {
+                            return PlayerMove<T>(row, columns, this->getPlayerSymbol());
+                        }
+                    }
+                }
+            }
+
             return PlayerMove<T>(0, 0, this->getPlayerSymbol());
         }
 

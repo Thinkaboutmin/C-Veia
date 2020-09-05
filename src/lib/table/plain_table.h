@@ -234,6 +234,47 @@ namespace tic_tac_toe {
             return player_cells;
         }
 
+        /*
+         * Return a std::vector<std::vector<unsigned short>> with
+         * all the rows and columns which still have a default type.
+         */ 
+        rowsAndColumns getEmptyCells() {
+            rowsAndColumns availableCells;
+
+            for (unsigned short row = 1; row <= this->rows; ++row) {
+                availableCells.emplace_back(std::vector<unsigned short>());
+                for (unsigned short column = 1; column <= this->columns; ++column) {
+                    if (*this->table_values[row - 1][column - 1] == this->empty_value) {
+                        availableCells[row - 1].emplace_back(column);
+                    }
+                }
+            }
+
+            return availableCells;
+        }
+
+        static rowsAndColumns convertRowsColumnsToColumnsRows(const rowsAndColumns & data) {
+            rowsAndColumns columns_rows;
+            if (data.size() == 0) {
+                return columns_rows;
+            }
+            columns_rows.resize(data.size());
+            for (unsigned short column = 1; column <= data.size(); ++column) {
+                if (data[column - 1].size() != 0) {
+                    for (unsigned short row = 1; row <= data.size(); ++row) {
+                        for (const unsigned short column_verifier : data[row - 1]) {
+                            if (column_verifier == column) {
+                                columns_rows[column - 1].emplace_back(row);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return columns_rows;
+        }
+
     protected:
         /*
          * Generate the value table with default values.

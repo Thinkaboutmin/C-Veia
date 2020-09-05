@@ -71,23 +71,6 @@ namespace tic_tac_toe {
             return false;
         }
 
-        // Return a std::vector<std::vector<unsigned short>> with
-        // all the rows and columns which still have a default type.
-        static rowsAndColumns getAvailableMoves(PlainTable<T> &table) {
-            rowsAndColumns availableCells;
-
-            for (unsigned short row = 1; row <= table.getRowsNum(); ++row) {
-                availableCells.emplace_back(std::vector<unsigned short>());
-                for (unsigned short column = 1; column <= table.getColumnsNum(); ++column) {
-                    if (*table.getCellValue(row, column) == table.getEmptyValue()) {
-                        availableCells[row - 1].emplace_back(column);
-                    }
-                }
-            }
-
-            return availableCells;
-        }
-
         Player(const T& symbol) {
             if (!verifyIfUsedSymbol(symbol)) {
                 this->player_symbol = symbol;
