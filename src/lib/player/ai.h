@@ -6,6 +6,7 @@
 #include <map>
 #include <utility>
 #include <functional>
+#include <array>
 
 #include "player.h"
 #include "../exceptions/player/player_exceptions.h"
@@ -204,13 +205,12 @@ namespace tic_tac_toe {
                 
             }
 
-            PlayerMove<T> move = multiMoveStrategy(table, my_cells, total_index);
+            PlayerMove<T> move = this->multiMoveStrategy(table, my_cells);
             if (checkMove(move)) {
                 return move;
             }
             
-            // TODO: Get the best move.
-            return this->easyMove(table);
+            return this->findTheBestMove(table, my_cells);
         }
 
         /*
@@ -636,9 +636,8 @@ namespace tic_tac_toe {
          *
          * table -> The table of the game.
          * my_cells -> This class pieces, the same as the player cell
-         * total_index -> The sum of a horizontal or vertical cells position. It's used to
          */
-        PlayerMove<T> multiMoveStrategy(PlainTable<T> & table, const rowsAndColumns & my_cells, const unsigned int & total_index) {
+        PlayerMove<T> multiMoveStrategy(PlainTable<T> & table, const rowsAndColumns & my_cells) {
             const unsigned short & rows = table.getRowsNum();
             const unsigned short & columns = table.getColumnsNum();
 
@@ -756,6 +755,110 @@ namespace tic_tac_toe {
             }
 
             return PlayerMove<T>(0, 0, this->getPlayerSymbol());
+        }
+
+        /*
+         * Tries to find the best move, that's really all.
+         *
+         * What it will try to do:
+         * See if there's a possibility to win and seek it without much strategy.
+         * Otherwise it will just search an empty cell and play on it.
+         *
+         * table -> The table of the game.
+         * my_cells -> This class pieces, the same as the player cell
+         */
+        PlayerMove<T> findTheBestMove(PlainTable<T> & table, const rowsAndColumns & my_cells) {
+            const unsigned short & rows = table.getRowsNum();
+            const unsigned short & columns = table.getColumnsNum();
+
+            rowsAndColumns empty_cells = table.getEmptyCells();
+
+            std::vector<bool> possibles_wins_horizontal;
+            std::vector<bool> possible_wins_vertical;
+            bool possible_win_forward_slash;
+            bool possible_win_backward_slash;
+
+            // Possibilities on winning.
+            for (unsigned short row = 0; row < rows; ++row) {
+                possibles_wins_horizontal.emplace_back(
+                    my_cells[row].size() + empty_cells[row].size() == rows
+                );
+            }
+            
+            rowsAndColumns empty_cells_columns = PlainTable<T>::convertRowsColumnsToColumnsRows(empty_cells);
+            rowsAndColumns my_cells_columns = PlainTable<T>::convertRowsColumnsToColumnsRows(my_cells);
+            for (unsigned short column = 0; column < columns; ++column) {
+                possible_wins_vertical.emplace_back(
+                    my_cells_columns[column].size() + empty_cells_columns[column].size() == columns
+                );
+            }
+
+            for (unsigned short row = 1, column = columns; row <= rows; ++row, --column) {
+                const T & value = *table.getCellValue(row, column);
+                possible_win_forward_slash = value == table.getEmptyValue() || value == this->getPlayerSymbol();
+                if (!possible_win_backward_slash) {
+                    break;
+                }
+            }
+
+            for (unsigned short row_column = 1; row_column <= rows; ++row_column) {
+                const T & value = *table.getCellValue(row_column, row_column);
+                possible_win_backward_slash = value == table.getEmptyValue() || value == this->getPlayerSymbol();
+                if (!possible_win_backward_slash) {
+                    break;
+                }
+            }
+
+            // Applying those possibilities.
+            for (unsigned short row = 1; row <= rows; ++row) {
+                if (possibles_wins_horizontal[row -1]) {
+                    for (unsigned short column = 1; column <= columns; ++column) {
+                        if (*table.getCellValue(row, column) == table.getEmptyValue()) {
+                            return PlayerMove<T>(row, column, this->getPlayerSymbol());
+                        }
+                    }
+                }
+            }
+
+            for (unsigned short column = 1; column <= columns; ++column) {
+                if (possible_wins_vertical[column - 1]) {
+                    for (unsigned short row = 1; row <= rows; ++row) {
+                        if (*table.getCellValue(row, column) == table.getEmptyValue()) {
+                            return PlayerMove<T>(row, column, this->getPlayerSymbol());
+                        }
+                    }
+                }
+            }
+
+            if (possible_win_forward_slash) {
+                for (unsigned short row = 1, column = columns; row <= rows; ++row, --column) {
+                    const T & value = *table.getCellValue(row, column);
+                    if (value == table.getEmptyValue()) {
+                        return PlayerMove<T>(row, column, this->getPlayerSymbol());
+                    }
+                }
+            }
+
+            if (possible_win_backward_slash) {
+                for (unsigned short row_column = 1; row_column <= rows; ++row_column) {
+                    const T & value = *table.getCellValue(row_column, row_column);
+                    if (value == table.getEmptyValue()) {
+                        return PlayerMove<T>(row_column, row_column, this->getPlayerSymbol());
+                    }
+                }
+            }
+
+            // Ditch win, last try to search for empty cells to finish the game.
+            for (unsigned short row = 1; row <= rows; ++row) {
+                for (unsigned short column = 1; column <= columns; ++column) {
+                    if (*table.getCellValue(row, column) == table.getEmptyValue()) {
+                        return PlayerMove<T>(row, column, this->getPlayerSymbol());
+                    }
+                }
+            }
+
+            // If we reached here, something is really wrong way beyond of the AI player...
+            throw OutOfMove();
         }
 
         /*
