@@ -209,6 +209,11 @@ namespace tic_tac_toe {
             if (checkMove(move)) {
                 return move;
             }
+
+            move = this->antiMultiMoveStrategy(table);
+            if (checkMove(move)) {
+                return move;
+            }
             
             return this->findTheBestMove(table, my_cells);
         }
@@ -751,6 +756,49 @@ namespace tic_tac_toe {
                             return PlayerMove<T>(row, columns, this->getPlayerSymbol());
                         }
                     }
+                }
+            }
+
+            return PlayerMove<T>(0, 0, this->getPlayerSymbol());
+        }
+
+
+        /*
+         * Verify if someone is almost completing the multi move strategy.
+         * If no strategy is found or already failed, it will return
+         * a PlayerMove<T> with row and column with value 0.
+         *
+         * This will verify if a side is almost being complete and then put
+         * a piece to ruin the strategy and hopefully survive or win a few
+         * more plays.
+         */
+        PlayerMove<T> antiMultiMoveStrategy(PlainTable<T> & table) {
+            const unsigned short & rows = table.getRowsNum();
+            const unsigned short & columns = table.getColumnsNum();
+    
+            if ((*table.getCellValue(1, 1) != table.getEmptyValue() ||
+                 *table.getCellValue(1, 1) != this->getPlayerSymbol())
+                &&
+                (*table.getCellValue(rows, columns) != table.getEmptyValue() ||
+                 *table.getCellValue(rows, columns) != this->getPlayerSymbol())) {
+                
+                if (*table.getCellValue(1, columns) == table.getEmptyValue()) {
+                    return PlayerMove<T>(1, columns, this->getPlayerSymbol());
+                } else if(*table.getCellValue(rows, 1) == table.getEmptyValue()) {
+                    return PlayerMove<T>(rows, 1, this->getPlayerSymbol());
+                }
+            }
+
+            if ((*table.getCellValue(1, columns) != table.getEmptyValue() ||
+                 *table.getCellValue(1, columns) != this->getPlayerSymbol())
+                 &&
+                (*table.getCellValue(rows, 1) != table.getEmptyValue() ||
+                 *table.getCellValue(rows, 1) != this->getPlayerSymbol())) {
+                
+                if (*table.getCellValue(1, 1) == table.getEmptyValue()) {
+                    return PlayerMove<T>(1, 1, this->getPlayerSymbol());
+                } else if(*table.getCellValue(rows, columns) == table.getEmptyValue()) {
+                    return PlayerMove<T>(rows, columns,this->getPlayerSymbol());
                 }
             }
 
