@@ -611,6 +611,33 @@ namespace tic_tac_toe {
             return PlayerMove<T>(0, 0, this->getPlayerSymbol());
         }
 
+        /*
+         * Tries a multi move strategy which, if complete, guarantees a win.
+         *
+         * The move is done by verifying the table, seeking if the
+         * down or up row and left or right column are free, without any
+         * piece other than the AI player.
+         *
+         * It then proceeds to fulfill the pieces while keeping the corner empty.
+         * Here's an example of how it looks step by step on a 3x3 table.
+         *
+         * If the strategy is inviable in any place of the table, it returns a
+         * filled PlayerMove<T> with 0 in column and row values.
+         *
+         *
+         * Piece on the corner
+         * | X |   | X | Piece on up row 
+         * -------------
+         * |   |   |   | 
+         * -------------
+         * | X |   |   |  Piece on the column
+         *
+         * Thus, it's possible to see that there's two possibilities to win after the complete strategy.
+         *
+         * table -> The table of the game.
+         * my_cells -> This class pieces, the same as the player cell
+         * total_index -> The sum of a horizontal or vertical cells position. It's used to
+         */
         PlayerMove<T> multiMoveStrategy(PlainTable<T> & table, const rowsAndColumns & my_cells, const unsigned int & total_index) {
             const unsigned short & rows = table.getRowsNum();
             const unsigned short & columns = table.getColumnsNum();

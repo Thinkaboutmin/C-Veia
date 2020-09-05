@@ -253,6 +253,19 @@ namespace tic_tac_toe {
             return availableCells;
         }
 
+        /*
+         * Invert the values of a rowsAndColumns data type making it
+         * a column vector rather than a row vector.
+         *
+         * Caution! This function only in squared vectors!
+         * 
+         * Example:
+         *
+         * Vector a represents 1 | 2 | 3 on index 1
+         * After the convertion it should represent on index 1 only 1
+         * and on the index 2 it should be only 1 (the column is 2 but the row is 1),
+         * and so on forth.
+         */
         static rowsAndColumns convertRowsColumnsToColumnsRows(const rowsAndColumns & data) {
             rowsAndColumns columns_rows;
             if (data.size() == 0) {
