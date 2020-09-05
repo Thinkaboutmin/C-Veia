@@ -17,10 +17,7 @@ terminal which supports ansi escapes.
 ```
 ## TODO
 
-* Implement a CLI playable interface - Partially
-  * AI - Partially done, only easy difficulty works (pure rng)
-  * Cli player - Done
-  * Menu - Done
+* Implement a CLI playable interface - Done
 * Possibility to play it online (why not? :P) 
 * Implement an OpenGl playable interface
 * Implement a Vulkan playable interface
