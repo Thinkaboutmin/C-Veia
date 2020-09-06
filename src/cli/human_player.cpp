@@ -80,7 +80,7 @@ PlayerMove<std::wstring> HumanPlayer::parseMove(std::wstring string) {
 	}
 
 	// Safely verify if there's an error when parsing the row and column string.
-	int row;
+	int row = 0;
 	try {
 		std::wstring s_row = string.substr(0, sep_found);
 		row = std::stoi(s_row);
@@ -91,7 +91,7 @@ PlayerMove<std::wstring> HumanPlayer::parseMove(std::wstring string) {
 		return move;
 	}
 
-	int column;
+	int column = 0;
 	try {
 		std::wstring s_column = string.substr(sep_found + 1);
 		column = std::stoi(s_column);
@@ -101,7 +101,6 @@ PlayerMove<std::wstring> HumanPlayer::parseMove(std::wstring string) {
 		move.w_msg = L"Pass a valid value for the column";
 		return move;
 	}
-
 	if (row > PlainTable<std::wstring>::max_row_size) {
 		PlayerMove<std::wstring> move;
 		move.failure = true;
@@ -110,13 +109,13 @@ PlayerMove<std::wstring> HumanPlayer::parseMove(std::wstring string) {
 	} else if(column > PlainTable<std::wstring>::max_column_size) {
 		PlayerMove<std::wstring> move;
 		move.failure = true;
-		move.w_msg = L"Size of the row is too big";
+		move.w_msg = L"Size of the column is too big";
 		return move;
 	}
 
-	PlayerMove<std::wstring> move(row, column, this->getPlayerSymbol());
-
-	return move;
+	return PlayerMove<std::wstring>{static_cast<unsigned short>(row), 
+								  static_cast<unsigned short>(column),
+								  this->getPlayerSymbol()};
 }
 
 PlayerMove<std::wstring> HumanPlayer::checkIfMoveIsValid(PlayerMove<std::wstring> move, PlainTable<std::wstring> & table,
