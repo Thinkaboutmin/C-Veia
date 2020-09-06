@@ -25,7 +25,7 @@ struct PlayerMove {
 
     PlayerMove() = default;
 
-	void operator = (PlayerMove<T> move) {
+	void operator = (const PlayerMove<T> & move) {
 		this->b_column = move.column;
 		this->b_row = move.row;
 		this->value = move.value;
