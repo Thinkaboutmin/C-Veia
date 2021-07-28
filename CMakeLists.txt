@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.17)
 project(ticTacToe)
 
 set(CMAKE_CXX_STANDARD 20)
-
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 # Choose which binary to compile.
 
 # Defaults to cli compilation even if it's off.

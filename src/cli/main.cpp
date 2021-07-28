@@ -5,6 +5,8 @@
 #include "cli_tic_tac_toe.h"
 #include "menu.h"
 #include "../lib/player/ai.h"
+#include "../lib/player/ai_min_max.h"
+#include "../lib/player/ai_min_max_pruned.h"
 #include "human_player.h"
 #include "string_table.h"
 #include "screen.h"
@@ -45,6 +47,9 @@ int main(int argc, char ** argv) {
                     std::vector<Player<std::wstring> *> players = menu.getPlayers();
                     StringTable * table = menu.getTable();
                     game = new CliTicTacToe(screen, players, table);
+                    for (const auto player : game->getPlayers()) {
+                        player->injectJudge(game);
+                    }
                     break;
                 }
             }
