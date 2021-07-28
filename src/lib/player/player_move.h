@@ -13,8 +13,13 @@ struct PlayerMove {
         unsigned short b_row = 0;
         unsigned short b_column = 0;
     public:
-        const unsigned short &row = b_row;
-        const unsigned short &column = b_column;
+        const unsigned short & getRow() {
+            return this->b_row;
+        }
+
+        const unsigned short & getColumn() {
+            return this->b_column;
+        }
         const T *value = nullptr;
         bool failure = false;
         std::string msg;
@@ -25,13 +30,15 @@ struct PlayerMove {
 
     PlayerMove() = default;
 
-	void operator = (const PlayerMove<T> & move) {
-		this->b_column = move.column;
-		this->b_row = move.row;
+	PlayerMove<T> & operator = (const PlayerMove<T> & move) {
+		this->b_column = move.b_column;
+		this->b_row = move.b_row;
 		this->value = move.value;
 		this->failure = move.failure;
 		this->w_msg = move.w_msg;
 		this->msg = move.msg;
+
+        return *this;
 	}
 };
 

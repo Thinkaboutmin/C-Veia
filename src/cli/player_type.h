@@ -3,7 +3,8 @@
 
 enum class PlayerType {
     USER,
-    AI
+    AI,
+    AIMinMax,
 };
 
 #endif
