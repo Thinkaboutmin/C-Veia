@@ -1,6 +1,7 @@
 #include "menu.h"
 #include "human_player.h"
 #include "../lib/player/ai.h"
+#include "../lib/player/ai_min_max_pruned.h"
 
 #include <utility>
 #include <array>
@@ -153,13 +154,14 @@ Menu & Menu::playersMenu() {
 Menu & Menu::addPlayer() {
     this->screen.clearScreen();
 
-    std::array<std::wstring, 3> options {
+    std::array<std::wstring, 4> options {
         L"Human player (played by users)",
         L"AI Player (played by the computer)",
+        L"AI Player with MinMax",
         L"Go back to player menu"
     };
 
-    Menu::printOptions<3>(options);
+    Menu::printOptions<4>(options);
 
     this->screen.print(select_msg);
     unsigned int row = this->screen.getRow();
@@ -171,8 +173,9 @@ Menu & Menu::addPlayer() {
         switch(option) {
             case 1:
             case 2:
-                break;
             case 3:
+                break;
+            case 4:
                 return this->playersMenu();
                 break;
             default:
@@ -222,9 +225,12 @@ Menu & Menu::addPlayer() {
                 player = new HumanPlayer(symbol, this->screen);
                 this->playersType.emplace_back(&user);
 
-            } else {
+            } else if (option == 2) {
                 player = new AI<std::wstring>(symbol, dif);
                 this->playersType.emplace_back(&ai);
+            } else {
+                player = new AIMinMaxPruned<std::wstring>(symbol);
+                this->playersType.emplace_back(&aiMinMax);
             }
 
             this->players.emplace_back(player);
@@ -450,7 +456,21 @@ void Menu::printPlayers() {
     } else {
         this->screen.print(L"Players (order - symbol - type)\n");
         for (int i = 0; i < this->players.size(); ++i) {
-            std::wstring playerType = *this->playersType[i] == ai ? L"AI" : L"User";
+            std::wstring playerType = L"";
+            switch (*this->playersType[i]) {
+                case PlayerType::USER:
+                    playerType = L"User";
+                    break;
+                case PlayerType::AI:
+                    playerType = L"AI";
+                    break;
+                case PlayerType::AIMinMax:
+                    playerType = L"AIMinMax";
+                    break;
+                default:
+                    playerType = L"Unknown";
+                    break;
+            }
             this->screen.print(i + 1).print(L" - " + this->players[i]->getPlayerSymbol() + L" - " + playerType + L"\n");
         }
         this->screen.print(L"\n");

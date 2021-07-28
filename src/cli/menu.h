@@ -19,6 +19,8 @@ private:
     static constexpr PlayerType user = PlayerType::USER;
     static constexpr PlayerType ai = PlayerType::AI;
 
+    static constexpr PlayerType aiMinMax = PlayerType::AIMinMax;
+
     std::vector<Player<std::wstring> *> players;
 
     std::vector<const PlayerType *> playersType;
