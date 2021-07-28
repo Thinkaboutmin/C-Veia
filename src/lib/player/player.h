@@ -52,6 +52,14 @@ namespace tic_tac_toe {
             }
         }
 
+        
+        /*
+         * @param {void *} gameJudge - Should represent the TicTacToe class... But because of circular
+         * denpendency we are using a silly void * hack for now (forever?).
+         * 
+         */
+        virtual void injectJudge(void * gameJudge) {}
+
         // Make the player act by getting its move intent.
         virtual PlayerMove<T> getMove(PlainTable<T> &table) = 0;
 

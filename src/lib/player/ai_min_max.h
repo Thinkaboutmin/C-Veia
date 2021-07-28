@@ -36,7 +36,7 @@ namespace tic_tac_toe {
             return move.first;
         }
 
-        void injectJudge(TicTacToe<T> * gameJudge) {
+        void injectJudge(TicTacToe<T> * gameJudge) override {
             this->gameJudge = gameJudge;
         }
 

@@ -41,9 +41,10 @@ namespace tic_tac_toe {
 
             return move.first;
         }
+        void injectJudge(void * gameJudge) override {
+            TicTacToe<T> * ticPtr = reinterpret_cast<TicTacToe<T> *>(gameJudge);
 
-        void injectJudge(TicTacToe<T> * gameJudge) {
-            this->gameJudge = gameJudge;
+            this->gameJudge = ticPtr;
         }
 
 
@@ -94,14 +95,10 @@ namespace tic_tac_toe {
                             alpha = newMove.second;
                             best = newMove;
                         }
-                    } else {
-                        if (newMove.second < beta) {
-                            beta = newMove.second;
-                            best = newMove;
-                        }
-                    }
-
-                    if (alpha >= beta) {
+                    } else if (newMove.second < beta) {
+                        beta = newMove.second;
+                        best = newMove;
+                    } else if (alpha >= beta) {
                         return best;
                     }
                 }

@@ -8,8 +8,9 @@
 #include "../exceptions/tic_tac_toe/tic_tac_toe_exceptions.h"
 #include "tic_tac_toe_enum.h"
 
+
 namespace tic_tac_toe {
-    template<typename T>
+    
     /*
      * Tic Tac Toe game control.
      *
@@ -18,6 +19,7 @@ namespace tic_tac_toe {
      * implement such the same applies to the winner check condition
      * which needs to be explicit asked.
      */
+    template<typename T>
     class TicTacToe {
 
     /**************************************************************
@@ -59,9 +61,13 @@ namespace tic_tac_toe {
 
         TicTacToe<T> & playerPlay() {
             PlayerMove<T> move = getNextPlayer().getMove(*table);
-            table->setCellValue(move.row, move.column, move.value);
+            table->setCellValue(move.getRow(), move.getColumn(), move.value);
 
             return *this;
+        }
+
+        const std::vector<Player<T> *> & getPlayers() {
+            return players;
         }
 
         // Return the next player of our vector.
@@ -186,9 +192,10 @@ namespace tic_tac_toe {
             }
 
             if (win) {
-                this->winner = TicTacToe::checkSymbolForPlayer(checkSymbol);
+                this->winner = this->checkSymbolForPlayer(checkSymbol);
                 return GameStatus::WIN;
             } else if (!anyMovementAvailable()) {
+                this->winner = nullptr;
                 return GameStatus::DRAW;
             }
 

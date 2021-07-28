@@ -655,8 +655,8 @@ namespace tic_tac_toe {
 
             up_row_free = free_moves[0].size() + my_cells[0].size() == rows;
             down_row_free = free_moves[rows - 1].size() + my_cells[rows - 1].size() == rows;
-            rowsAndColumns free_moves_columns = PlainTable<T>::convertRowsColumnsToColumnsRows(free_moves);
-            rowsAndColumns my_cells_columns = PlainTable<T>::convertRowsColumnsToColumnsRows(my_cells);
+            rowsAndColumns free_moves_columns = PlainTable<T>::transposeTable(free_moves);
+            rowsAndColumns my_cells_columns = PlainTable<T>::transposeTable(my_cells);
             right_column_free = free_moves_columns[0].size() + my_cells_columns[0].size() == columns;
             left_column_free = free_moves_columns[rows - 1].size() + my_cells_columns[rows - 1].size() == columns;
             
@@ -833,8 +833,8 @@ namespace tic_tac_toe {
                 );
             }
             
-            rowsAndColumns empty_cells_columns = PlainTable<T>::convertRowsColumnsToColumnsRows(empty_cells);
-            rowsAndColumns my_cells_columns = PlainTable<T>::convertRowsColumnsToColumnsRows(my_cells);
+            rowsAndColumns empty_cells_columns = PlainTable<T>::transposeTable(empty_cells);
+            rowsAndColumns my_cells_columns = PlainTable<T>::transposeTable(my_cells);
             for (unsigned short column = 0; column < columns; ++column) {
                 possible_wins_vertical.emplace_back(
                     my_cells_columns[column].size() + empty_cells_columns[column].size() == columns
@@ -938,7 +938,7 @@ namespace tic_tac_toe {
          * otherwise, false is given.
          */
         bool checkMove(PlayerMove<T> move) {
-            if (move.column != 0 && move.row != 0) {
+            if (move.getColumn() != 0 && move.getRow() != 0) {
                 return true;
             }
 
