@@ -96,7 +96,7 @@ namespace tic_tac_toe {
         /*
          * Return the default or defined empty value for T.
          */
-        T getEmptyValue() {
+        T & getEmptyValue() {
             return this->empty_value;
         }
 
@@ -266,7 +266,7 @@ namespace tic_tac_toe {
          * and on the index 2 it should be only 1 (the column is 2 but the row is 1),
          * and so on forth.
          */
-        static rowsAndColumns convertRowsColumnsToColumnsRows(const rowsAndColumns & data) {
+        static rowsAndColumns transposeTable(const rowsAndColumns & data) {
             rowsAndColumns columns_rows;
             if (data.size() == 0) {
                 return columns_rows;
